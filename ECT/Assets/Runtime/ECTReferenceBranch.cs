@@ -44,6 +44,8 @@ namespace ECT
 
         public FindSystem Get<FindSystem>() where FindSystem : class, ISystem
         {
+            if(References == null) return null;
+
             foreach (var reference in References)
             {
                 FindSystem found = reference.Get<FindSystem>();
@@ -53,7 +55,7 @@ namespace ECT
             return null;
         }
 
-        public ECTValidation? QueryComponent<FindSystem> (out FindSystem find) where FindSystem : class, ISystem
+        public ECTValidation? QuerySystem<FindSystem> (out FindSystem find) where FindSystem : class, ISystem
         {
             find = Get<FindSystem>();
             return find != null ? new ECTValidation() : null;
