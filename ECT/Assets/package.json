@@ -1,0 +1,21 @@
+{
+    "name": "com.slice.ect",
+    "version": "0.1.0",
+    "displayName": "ECT- ECS-like Modularity in Unity",
+    "description": "TODO",
+    "unity": "2022.2",
+    "unityRelease": "0f1",
+    "author": 
+    {
+        "name": "SLICE Interactive",
+        "email": "slice.interactive.games@gmail.com"
+    },
+    "samples": 
+    [
+        {
+            "displayName": "Platformer",
+            "description": "TODO",
+            "path": "Samples/Platformer"
+        }
+    ]
+}
