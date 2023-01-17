@@ -33,7 +33,7 @@ namespace ECT
 
                 foreach (var validation in system.Validations)
                 {
-                    if(validation != null) continue;
+                    if(validation.Successful == false) continue;
                     passed = false;
                     break;
                 }
@@ -55,10 +55,10 @@ namespace ECT
             return null;
         }
 
-        public ECTValidation? QuerySystem<FindSystem> (out FindSystem find) where FindSystem : class, ISystem
+        public ECTValidation QuerySystem<FindSystem> (out FindSystem find) where FindSystem : class, ISystem
         {
             find = Get<FindSystem>();
-            return find != null ? new ECTValidation() : null;
+            return new ECTValidation(find != null);
         }
 
         public void Update (IParent root, IParent parent)
@@ -69,7 +69,7 @@ namespace ECT
         }
     }
 
-    public interface IReferenceBranch
+    public interface IReferenceBranch : IReferenceParent
     {
 
     }

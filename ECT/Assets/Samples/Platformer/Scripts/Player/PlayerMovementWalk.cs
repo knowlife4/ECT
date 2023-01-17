@@ -13,9 +13,15 @@ namespace ECT.Samples.Platformer
 
         public class WalkSystem : ComponentSystem<PlayerMovementWalk>
         {
+            public ECTAction GoingUp = new();
+
             protected override void OnUpdate()
             {
-                Root.transform.position = new(Root.transform.position.x, Mathf.Sin(Time.time * Component.Speed) * Component.Height, Root.transform.position.z);
+                float y = Mathf.Sin(Time.time * Component.Speed) * Component.Height;
+
+                Root.transform.position = new(Root.transform.position.x, y, Root.transform.position.z);
+
+                if(y > 0) GoingUp.Execute();
             }
         }
     }
