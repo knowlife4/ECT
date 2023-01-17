@@ -33,7 +33,7 @@ namespace ECT
 
                 foreach (var validation in system.Validations)
                 {
-                    if(validation.Successful == false) continue;
+                    if(validation.Successful == true) continue;
                     passed = false;
                     break;
                 }
