@@ -13,6 +13,9 @@ namespace ECT
         
         public IReference[] References { get; private set; }
 
+        public ECTAction PreUpdate = new();
+        public ECTAction PostUpdate = new();
+
         void CreateReferences (IParent root, IParent parent)
         {
             List<IReference> references = new();
@@ -65,7 +68,9 @@ namespace ECT
         {
             if(References == null || Components.Length != References.Length) CreateReferences(root, parent);
 
+            PreUpdate.Execute();
             UpdateReferences();
+            PostUpdate.Execute();
         }
     }
 

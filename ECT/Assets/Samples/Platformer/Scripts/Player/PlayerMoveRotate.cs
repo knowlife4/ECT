@@ -1,4 +1,9 @@
+using Unity.Mathematics;
 using UnityEngine;
+using Unity.Burst;
+using ECT.Parallel;
+using Unity.Jobs;
+using Unity.Collections;
 
 namespace ECT.Samples.Platformer
 {
@@ -6,21 +11,59 @@ namespace ECT.Samples.Platformer
     public class PlayerMovementRotate : PlayerMovement.ChildComponent
     {
         public float Speed;
-        protected override ISystem System => new RotateSystem();
+        protected override ISystem System => new RotateSystemParallel();
 
         public class RotateSystem : ComponentSystem<PlayerMovementRotate>
         {
             protected override void OnUpdate()
             {
-                if(!QuerySystem(out PlayerMovementWalk.WalkSystem walkSystem).Successful) return;
-                Root.transform.Rotate(new Vector3(0, Time.deltaTime * Component.Speed * 100, 0));
+                float3 direction = Root.Target.position - Root.transform.position;
 
-                walkSystem.GoingUp.Subscribe(RotateX);
+                float rotationSpeed = Component.Speed * Time.deltaTime;
+                float3 up = new(0f, 1f, 0f);
+
+                Root.transform.rotation = math.slerp(Root.transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
+            }
+        }
+
+        public class RotateSystemParallel : ComponentParallelSystem<PlayerMovementRotate, JobData>
+        {
+            public override JobData CreateData() => new()
+            {
+                Transform = Root.transform,
+                Target = Root.Target,
+                Speed = Component.Speed,
+                DeltaTime = Time.deltaTime
+            };
+
+            ECTParallelJob<JobData> job;
+
+            public override IJobParallelFor CreateJob(NativeArray<JobData> dataArray)
+            {
+                job = new(dataArray);
+                return job;
             }
 
-            public void RotateX ()
+            public override void OnComplete(JobData data) => Root.transform.rotation = data.Transform.rotation;
+        }
+
+        public struct JobData : IParallelData
+        {
+            public ECTParallelTransform Transform;
+            public ECTParallelTransform Target;
+
+            public float Speed;
+            public float DeltaTime;
+            
+            [BurstCompile]
+            public void Execute ()
             {
-                Root.transform.Rotate(new Vector3(Time.deltaTime * Component.Speed * 100, 0, 0));
+                float3 direction = Target.position - Transform.position;
+
+                float rotationSpeed = Speed * DeltaTime;
+                float3 up = new(0f, 1f, 0f);
+
+                Transform.rotation = math.slerp(Transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
             }
         }
     }

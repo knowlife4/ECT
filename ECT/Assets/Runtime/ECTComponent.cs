@@ -1,4 +1,5 @@
 using UnityEngine;
+using ECT.Parallel;
 
 namespace ECT
 {
@@ -13,41 +14,22 @@ namespace ECT
         public IReference CreateReference(IParent root, IParent parent)
         {
             ISystem system = System;
-            if(parent as MyParent == null) Debug.Log(typeof(MyParent));
             IReference reference = CreateReference((MyRoot)root, (MyParent)parent, system);
             system.SetReference(reference);
+            system.Initialize();
 
             return reference;
         }
 
         public abstract class ComponentSystem<Component> : ECTSystem<ComponentReference, Component, MyRoot, MyParent> where Component : class, IComponent {}
 
+        public abstract class ComponentParallelSystem<Component, MyData> : ECTParallelSystem<ComponentReference, Component, MyRoot, MyParent, MyData, ECTParallelJob<MyData>> where Component : class, IComponent where MyData : unmanaged, IParallelData {}
+
+        public abstract class ComponentGroup : ECTComponentGroup<MyRoot, MyParent, MyComponent, ComponentGroup> {}
+
         public class ComponentReference : ECTReference<MyRoot, MyParent, MyComponent>
         {
             public ComponentReference(MyComponent reference, MyRoot root, MyParent parent, ISystem system) : base(reference, root, parent, system) {}
-        }
-
-        public abstract class ComponentGroup : ECTComponent<MyRoot, MyParent, MyComponent>, IParent
-        {
-            public ECTBranch<ChildComponent> Components;
-
-            protected override IReference CreateReference(MyRoot root, MyParent parent, ISystem system) => new ComponentGroupReference(this, root, parent, system, Components);
-
-            public abstract class ChildComponent : ECTComponent<MyRoot, ComponentGroup, ChildComponent> {}
-
-            public class ComponentGroupReference : ECTReference<MyRoot, MyParent, ComponentGroup>
-            {
-                public ECTReferenceBranch ReferenceBranch { get; }
-
-                public ComponentGroupReference(ComponentGroup reference, MyRoot root, MyParent parent, ISystem system, ECTBranch<ChildComponent> branch) : base(reference, root, parent, system) => ReferenceBranch = new(branch.Components);
-
-                public override FindSystem Get<FindSystem>() => System is FindSystem system ? system : ReferenceBranch.Get<FindSystem>();
-            }
-
-            public new abstract class ComponentSystem<Component> : ECTSystem<ComponentGroupReference, Component, MyRoot, MyParent> where Component : class, IComponent 
-            {
-                protected override void OnUpdate() => Reference.ReferenceBranch.Update(Reference.Root, Reference.Component);
-            }
         }
     }
 
