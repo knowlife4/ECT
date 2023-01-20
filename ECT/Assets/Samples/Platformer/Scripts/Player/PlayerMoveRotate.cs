@@ -28,7 +28,7 @@ namespace ECT.Samples.Platformer
 
         public class RotateSystemParallel : ComponentParallelSystem<PlayerMovementRotate, JobData>
         {
-            public override JobData CreateData() => new()
+            public override JobData Data => new()
             {
                 Transform = Root.transform,
                 Target = Root.Target,
@@ -36,18 +36,13 @@ namespace ECT.Samples.Platformer
                 DeltaTime = Time.deltaTime
             };
 
-            ECTParallelJob<JobData> job;
-
-            public override IJobParallelFor CreateJob(NativeArray<JobData> dataArray)
-            {
-                job = new(dataArray);
-                return job;
-            }
+            public override ECTParallelJob<JobData> Job { get; set; }
+            public override ECTParallelJob<JobData> CreateJob(NativeArray<JobData> dataArray) => Job = new(dataArray);
 
             public override void OnComplete(JobData data) => Root.transform.rotation = data.Transform.rotation;
         }
 
-        public struct JobData : IParallelData
+        public struct JobData : IParallelData<JobData>
         {
             public ECTParallelTransform Transform;
             public ECTParallelTransform Target;
@@ -56,7 +51,7 @@ namespace ECT.Samples.Platformer
             public float DeltaTime;
             
             [BurstCompile]
-            public void Execute ()
+            public JobData Execute ()
             {
                 float3 direction = Target.position - Transform.position;
 
@@ -64,6 +59,8 @@ namespace ECT.Samples.Platformer
                 float3 up = new(0f, 1f, 0f);
 
                 Transform.rotation = math.slerp(Transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
+
+                return this;
             }
         }
     }

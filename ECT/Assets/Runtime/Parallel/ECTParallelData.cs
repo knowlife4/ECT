@@ -1,7 +1,7 @@
 namespace ECT.Parallel
 {
-    public interface IParallelData
+    public interface IParallelData<MyData> where MyData : unmanaged, IParallelData<MyData>
     {
-        public void Execute();
+        public MyData Execute();
     }
 }

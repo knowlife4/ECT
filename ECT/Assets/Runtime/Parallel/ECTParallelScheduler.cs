@@ -15,7 +15,7 @@ namespace ECT.Parallel
             if(!systems.Contains(system)) systems.Add(system);
         }
 
-        public void Execute<MyJob, MyData>(IParallelSystem current) where MyJob : unmanaged, IJobParallelFor where MyData : unmanaged, IParallelData
+        public void Execute<MyJob, MyData>(IParallelSystem current) where MyJob : unmanaged, IJobParallelFor where MyData : unmanaged, IParallelData<MyData>
         {
             if(systems.Count == 0) return;
 
