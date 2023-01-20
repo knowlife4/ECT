@@ -20,6 +20,8 @@ namespace ECT
         public abstract class EntityComponent : ECTComponent<MyEntity, MyEntity, EntityComponent> { }
 
         public ECTValidation QuerySystem<FindSystem>(out FindSystem find) where FindSystem : class, ISystem => ReferenceBranch.QuerySystem(out find);
+
+        protected void UpdateComponents () => referenceBranch.Update(this, this);
     }
 
     public interface IEntity : IParent

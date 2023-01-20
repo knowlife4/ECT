@@ -3,7 +3,11 @@ namespace ECT
     public struct ECTValidation
     {
         public ECTValidation(bool successful) => Successful = successful;
-        public ECTValidation(object objectToValidate) => Successful = objectToValidate != null;
+        public static ECTValidation Validate<T>(T input, out T output) where T : class
+        {
+            output = input;
+            return new(input == null);
+        }
 
         public bool Successful { get; }
     }
