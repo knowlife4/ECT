@@ -46,7 +46,9 @@ namespace ECT
 
             public new abstract class ComponentSystem<Component> : ECTSystem<ComponentGroupReference, Component, MyRoot, MyParent> where Component : class, IComponent 
             {
-                protected override void OnUpdate() => Reference.ReferenceBranch.Update(Reference.Root, Reference.Component);
+                protected override void OnUpdate() => UpdateChildren();
+
+                public void UpdateChildren() => Reference.ReferenceBranch.Update(Reference.Root, Reference.Component);
             }
         }
     }
