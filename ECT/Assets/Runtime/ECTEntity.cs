@@ -21,7 +21,7 @@ namespace ECT
 
         public ECTValidation QuerySystem<FindSystem>(out FindSystem find) where FindSystem : class, ISystem => ReferenceBranch.QuerySystem(out find);
 
-        public void UpdateChildren() => referenceBranch.Update(this, this);
+        public void UpdateChildren() => ReferenceBranch.Update(this, this);
     }
 
     public interface IEntity : IParent
