@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ECT
 {
-    public class ECTAction
+    public struct ECTAction
     {
         private List<Action> callbacks;
 
