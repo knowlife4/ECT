@@ -1,42 +1,50 @@
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Jobs;
 
 namespace ECT.Parallel
 {
-    public abstract class ECTParallelSystem<MyReference, MyComponent, MyRoot, MyParent, MyData, MyJob> : ECTSystem<MyReference, MyComponent, MyRoot, MyParent>, IParallelSystem where MyReference : IReference where MyComponent : class, IComponent where MyRoot : class, IParent, IReferenceParent where MyParent : class, IParent where MyData : unmanaged, IParallelData<MyData> where MyJob : unmanaged, IJobParallelFor
+    public abstract class ECTParallelSystem<MyReference, MyComponent, MyRoot, MyParent, MyData> : ECTSystem<MyReference, MyComponent, MyRoot, MyParent>, IParallelSystem
+    where MyReference : IReference
+    where MyComponent : class, IComponent
+    where MyRoot : class, IParent, IReferenceParent
+    where MyParent : class, IParent
+    where MyData : unmanaged, IParallelData<MyData>
     {
-        static ECTParallelScheduler scheduler = new();
+        static internal ECTParallelScheduler<MyData> scheduler = new();
+        private MyData data;
+
+        public object Data
+        {
+            get
+            {
+                return data;
+            }
+            set
+            {
+                data = (MyData)value;
+            }
+        }
 
         protected sealed override void OnInitialize() => scheduler.Schedule(this);
+        protected sealed override void OnUpdate()
+        {
+            UpdateData(ref data);
+            scheduler.systems[this] = data;
+            scheduler.Execute(this);
+        }
 
-        protected sealed override void OnUpdate() => scheduler.Execute<MyJob, MyData>(this);
+        public abstract void UpdateData(ref MyData data);
 
-        public abstract MyData Data { get; }
-        object IParallelSystem.CreateData() => Data;
+        public abstract void OnComplete(MyData data);
+        public void OnComplete() => OnComplete(data);
 
-        public abstract MyJob Job { get; set; }
-        public abstract MyJob CreateJob(NativeArray<MyData> dataArray);
-        public IJobParallelFor CreateJob(object dataArray) => CreateJob((NativeArray<MyData>)dataArray);
-
-        public abstract void OnComplete (MyData data);
-        public void OnComplete(object data) => OnComplete((MyData)data);
-    }
-
-    [BurstCompile]
-    public struct ECTParallelJob<MyData> : IJobParallelFor where MyData : unmanaged, IParallelData<MyData>
-    {
-        public ECTParallelJob(NativeArray<MyData> thisData) => data = thisData;
-
-        NativeArray<MyData> data;
-
-        public void Execute(int index) => data[index] = data[index].Execute();
+        public abstract void Schedule(NativeArray<MyData> dataArray);
+        public void Schedule(object dataArrayObject) => Schedule((NativeArray<MyData>)dataArrayObject);
     }
 
     public interface IParallelSystem
     {
-        public IJobParallelFor CreateJob(object dataArray);
-        public object CreateData();
-        public void OnComplete (object data);
+        public object Data { get; set; }
+        public void Schedule (object dataArrayObject);
+        public void OnComplete ();
     }
 }

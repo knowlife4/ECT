@@ -1,21 +1,21 @@
 using System.Collections.Generic;
-using Unity.Jobs;
-using Unity.Burst;
+using System.Linq;
 using Unity.Collections;
 
 namespace ECT.Parallel
 {
-    public class ECTParallelScheduler
+    public class ECTParallelScheduler<MyData>
+    where MyData : unmanaged, IParallelData<MyData>
     {
-        List<IParallelSystem> systems = new();
+        internal Dictionary<IParallelSystem, MyData> systems = new();
         int completed;
 
         public void Schedule (IParallelSystem system)
         {
-            if(!systems.Contains(system)) systems.Add(system);
+            if(!systems.ContainsKey(system)) systems.Add(system, (MyData)system.Data);
         }
 
-        public void Execute<MyJob, MyData>(IParallelSystem current) where MyJob : unmanaged, IJobParallelFor where MyData : unmanaged, IParallelData<MyData>
+        public void Execute(IParallelSystem current)
         {
             if(systems.Count == 0) return;
 
@@ -27,26 +27,17 @@ namespace ECT.Parallel
 
             completed = 0;
 
-            List<MyData> allData = new();
+            NativeArray<MyData> nativeJobData = new(systems.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            nativeJobData.CopyFrom(systems.Values.ToArray());
 
-            foreach (var system in systems)
+            current.Schedule(nativeJobData);
+
+            var iterator = 0;
+            foreach (var system in systems.Keys)
             {
-                allData.Add((MyData)system.CreateData());
-            }
-
-            NativeArray<MyData> nativeJobData = new(allData.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            nativeJobData.CopyFrom(allData.ToArray());
-
-            MyJob job = (MyJob)current.CreateJob(nativeJobData);
-
-            JobHandle jobHandle = job.Schedule(allData.Count, 1);
-
-            jobHandle.Complete();
-
-            for (int i = 0; i < systems.Count; i++)
-            {
-                var system = systems[i];
-                system.OnComplete(nativeJobData[i]);
+                system.Data = nativeJobData[iterator];
+                system.OnComplete();
+                iterator++;
             }
 
             nativeJobData.Dispose();

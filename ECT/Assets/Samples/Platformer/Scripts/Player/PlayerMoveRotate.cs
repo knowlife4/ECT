@@ -26,32 +26,30 @@ namespace ECT.Samples.Platformer
             }
         }
 
-        public class RotateSystemParallel : ComponentParallelSystem<PlayerMovementRotate, JobData>
+        public class RotateSystemParallel : ComponentParallelSystem<PlayerMovementRotate, ParallelData>
         {
-            public override JobData Data => new()
+            public override void UpdateData(ref ParallelData data)
             {
-                Transform = Root.transform,
-                Target = Root.Target,
-                Speed = Component.Speed,
-                DeltaTime = Time.deltaTime
-            };
+                data.Transform = Root.transform;
+                data.Target = Root.Target;
+                data.Speed = Component.Speed;
+                data.DeltaTime = Time.deltaTime;
+            }
 
-            public override ECTParallelJob<JobData> Job { get; set; }
-            public override ECTParallelJob<JobData> CreateJob(NativeArray<JobData> dataArray) => Job = new(dataArray);
+            public override void OnComplete(ParallelData data) => Root.transform.rotation = data.Transform.rotation;
 
-            public override void OnComplete(JobData data) => Root.transform.rotation = data.Transform.rotation;
+            public override void Schedule(NativeArray<ParallelData> dataArray) => API.ParallelJobExecute(dataArray).Run();
         }
 
-        public struct JobData : IParallelData<JobData>
+        public struct ParallelData : IParallelData<ParallelData>
         {
             public ECTParallelTransform Transform;
             public ECTParallelTransform Target;
 
             public float Speed;
             public float DeltaTime;
-            
-            [BurstCompile]
-            public JobData Execute ()
+
+            public ParallelData Execute()
             {
                 float3 direction = Target.position - Transform.position;
 

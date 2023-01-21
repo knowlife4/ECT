@@ -1,5 +1,4 @@
 using UnityEngine;
-using ECT.Parallel;
 
 namespace ECT
 {
@@ -23,7 +22,7 @@ namespace ECT
 
         public abstract class ComponentSystem<Component> : ECTSystem<ComponentReference, Component, MyRoot, MyParent> where Component : class, IComponent {}
 
-        public abstract class ComponentParallelSystem<Component, MyData> : ECTParallelSystem<ComponentReference, Component, MyRoot, MyParent, MyData, ECTParallelJob<MyData>> where Component : class, IComponent where MyData : unmanaged, IParallelData<MyData> {}
+        public abstract class ComponentParallelSystem<Component, MyData> : Parallel.ECTParallelSystem<ComponentReference, Component, MyRoot, MyParent, MyData> where Component : class, IComponent where MyData : unmanaged, Parallel.IParallelData<MyData> {}
 
         public abstract class ComponentGroup : ECTComponentGroup<MyRoot, MyParent, MyComponent, ComponentGroup> {}
 
