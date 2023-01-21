@@ -13,14 +13,18 @@ namespace ECT
         public IReference CreateReference(IParent root, IParent parent)
         {
             ISystem system = System;
-            if(parent as MyParent == null) Debug.Log(typeof(MyParent));
             IReference reference = CreateReference((MyRoot)root, (MyParent)parent, system);
             system.SetReference(reference);
+            system.Initialize();
 
             return reference;
         }
 
         public abstract class ComponentSystem<Component> : ECTSystem<ComponentReference, Component, MyRoot, MyParent> where Component : class, IComponent {}
+
+        public abstract class ComponentParallelSystem<Component, MyData> : Parallel.ECTParallelSystem<ComponentReference, Component, MyRoot, MyParent, MyData> where Component : class, IComponent where MyData : unmanaged, Parallel.IParallelData<MyData> {}
+
+        public abstract class ComponentGroup : ECTComponentGroup<MyRoot, MyParent, MyComponent, ComponentGroup> {}
 
         public class ComponentReference : ECTReference<MyRoot, MyParent, MyComponent>
         {
@@ -46,9 +50,7 @@ namespace ECT
 
             public new abstract class ComponentSystem<Component> : ECTSystem<ComponentGroupReference, Component, MyRoot, MyParent> where Component : class, IComponent 
             {
-                protected override void OnUpdate() => UpdateChildren();
-
-                public void UpdateChildren() => Reference.ReferenceBranch.Update(Reference.Root, Reference.Component);
+                protected override void OnUpdate() => Reference.ReferenceBranch.Update(Reference.Root, Reference.Component);
             }
         }
     }
