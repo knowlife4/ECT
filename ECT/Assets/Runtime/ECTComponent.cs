@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ECT
 {
-    public abstract class ECTComponent<MyRoot, MyParent, MyComponent> : ScriptableObject, IComponent where MyRoot : class, IParent, IReferenceParent where MyParent : class, IParent where MyComponent : class, IComponent
+    public abstract class ECTComponent<MyRoot, MyParent, MyComponent> : ScriptableObject, IComponent where MyRoot : class, IRoot where MyParent : class, IParent where MyComponent : class, IComponent
     {
         protected MyComponent ThisComponent => this as MyComponent;
 

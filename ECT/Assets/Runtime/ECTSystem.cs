@@ -1,6 +1,6 @@
 namespace ECT
 {
-    public abstract class ECTSystem<MyReference, MyComponent, MyRoot, MyParent> : ISystem, IReferenceParent where MyReference : IReference where MyComponent : class, IComponent where MyRoot : class, IParent, IReferenceParent where MyParent : class, IParent
+    public abstract class ECTSystem<MyReference, MyComponent, MyRoot, MyParent> : ISystem, IReferenceParent where MyReference : IReference where MyComponent : class, IComponent where MyRoot : class, IRoot where MyParent : class, IParent
     {
         public MyReference Reference { get; private set; }
 

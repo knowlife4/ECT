@@ -6,6 +6,6 @@ namespace ECT.Samples.Platformer
     {
         public Transform Target;
 
-        public void Update() => ReferenceBranch.Update(this, this);
+        public void Update() => UpdateChildren();
     }
 }

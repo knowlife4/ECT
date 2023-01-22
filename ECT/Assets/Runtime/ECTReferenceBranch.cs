@@ -13,8 +13,8 @@ namespace ECT
         
         public IReference[] References { get; private set; }
 
-        public ECTAction PreUpdate = new();
-        public ECTAction PostUpdate = new();
+        public ECTAction OnPreUpdate { get; }
+        public ECTAction OnPostUpdate { get; }
 
         void CreateReferences (IParent root, IParent parent)
         {
@@ -68,14 +68,15 @@ namespace ECT
         {
             if(References == null || Components.Length != References.Length) CreateReferences(root, parent);
 
-            PreUpdate.Execute();
+            OnPreUpdate.Execute();
             UpdateReferences();
-            PostUpdate.Execute();
+            OnPostUpdate.Execute();
         }
     }
 
     public interface IReferenceBranch : IReferenceParent
     {
-
+        public ECTAction OnPreUpdate { get; }
+        public ECTAction OnPostUpdate { get; }
     }
 }

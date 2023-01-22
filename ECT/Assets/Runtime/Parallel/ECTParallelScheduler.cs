@@ -7,33 +7,39 @@ namespace ECT.Parallel
     public class ECTParallelScheduler<MyData>
     where MyData : unmanaged, IParallelData<MyData>
     {
-        internal Dictionary<IParallelSystem, MyData> systems = new();
-        int completed;
+        internal HashSet<IParallelSystem> systems = new();
+        internal Dictionary<IParallelSystem, MyData> data = new();
 
         public void Schedule (IParallelSystem system)
         {
-            if(!systems.ContainsKey(system)) systems.Add(system, (MyData)system.Data);
+            if(systems.Contains(system)) return;
+            systems.Add(system);
+            data.Add(system, (MyData)system.Data);
         }
+
+        List<MyData> currentData = new();
+
+        NativeArray<MyData> nativeJobData;
 
         public void Execute(IParallelSystem current)
         {
             if(systems.Count == 0) return;
 
-            if(completed < systems.Count)
+            foreach (var system in systems)
             {
-                completed++;
-                return;
+                if(!system.Execute) return;
+                currentData.Add(data[system]);
             }
+            
+            if(currentData.Count == 0) return;
 
-            completed = 0;
-
-            NativeArray<MyData> nativeJobData = new(systems.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            nativeJobData.CopyFrom(systems.Values.ToArray());
+            nativeJobData = new(currentData.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            nativeJobData.CopyFrom(currentData.ToArray());
 
             current.Schedule(nativeJobData);
-
+            
             var iterator = 0;
-            foreach (var system in systems.Keys)
+            foreach (var system in systems)
             {
                 system.Data = nativeJobData[iterator];
                 system.OnComplete();
@@ -41,6 +47,7 @@ namespace ECT.Parallel
             }
 
             nativeJobData.Dispose();
+            currentData.Clear();
         }
     }
 }
