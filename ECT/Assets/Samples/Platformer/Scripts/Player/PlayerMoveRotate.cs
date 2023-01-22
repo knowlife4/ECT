@@ -23,20 +23,34 @@ namespace ECT.Samples.Platformer
                 float3 up = new(0f, 1f, 0f);
 
                 Root.transform.rotation = math.slerp(Root.transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
+
+                for (int i = 0; i < 10000; i++)
+                {
+                    math.sqrt(math.log10(i));
+                }
             }
         }
 
         public class RotateSystemParallel : ComponentParallelSystem<PlayerMovementRotate, ParallelData>
         {
+            Transform transform;
+            Transform target;
+
+            public override ECTValidation[] Validations => new[]
+            {
+                ECTValidation.Validate(Root.transform, out transform),
+                ECTValidation.Validate(Root.Target, out target)
+            };
+
             public override void UpdateData(ref ParallelData data)
             {
-                data.Transform = Root.transform;
-                data.Target = Root.Target;
+                data.Transform = transform;
+                data.Target = target;
                 data.Speed = Component.Speed;
                 data.DeltaTime = Time.deltaTime;
             }
 
-            public override void OnComplete(ParallelData data) => Root.transform.rotation = data.Transform.rotation;
+            public override void OnComplete(ParallelData data) => transform.rotation = data.Transform.rotation;
 
             public override void Schedule(NativeArray<ParallelData> dataArray) => API.ParallelJobExecute(dataArray).Run();
         }
@@ -57,6 +71,11 @@ namespace ECT.Samples.Platformer
                 float3 up = new(0f, 1f, 0f);
 
                 Transform.rotation = math.slerp(Transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
+
+                for (int i = 0; i < 10000; i++)
+                {
+                    math.sqrt(math.log10(i));
+                }
 
                 return this;
             }

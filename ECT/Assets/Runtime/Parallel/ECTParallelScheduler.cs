@@ -8,13 +8,11 @@ namespace ECT.Parallel
     where MyData : unmanaged, IParallelData<MyData>
     {
         internal HashSet<IParallelSystem> systems = new();
-        internal Dictionary<IParallelSystem, MyData> data = new();
 
         public void Schedule (IParallelSystem system)
         {
             if(systems.Contains(system)) return;
             systems.Add(system);
-            data.Add(system, (MyData)system.Data);
         }
 
         List<MyData> currentData = new();
@@ -28,7 +26,7 @@ namespace ECT.Parallel
             foreach (var system in systems)
             {
                 if(!system.Execute) return;
-                currentData.Add(data[system]);
+                currentData.Add((MyData)system.Data);
             }
             
             if(currentData.Count == 0) return;

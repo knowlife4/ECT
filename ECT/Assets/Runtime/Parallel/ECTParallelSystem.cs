@@ -34,8 +34,6 @@ namespace ECT.Parallel
 
             UpdateData(ref data);
 
-            scheduler.data[this] = data;
-
             if (Root is not IEntity entity) return;
             
             IEntity[] entities = entity.GetAll();
