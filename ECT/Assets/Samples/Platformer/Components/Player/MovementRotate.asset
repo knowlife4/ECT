@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c13f44617056bbf428433b078cd61794, type: 3}
   m_Name: MovementRotate
   m_EditorClassIdentifier: 
+  UseMultithreading: 1
+  UseBurst: 1
   Speed: 10

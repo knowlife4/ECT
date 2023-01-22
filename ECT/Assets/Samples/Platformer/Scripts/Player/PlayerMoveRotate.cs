@@ -10,8 +10,11 @@ namespace ECT.Samples.Platformer
     [CreateAssetMenu]
     public class PlayerMovementRotate : PlayerMovement.ChildComponent
     {
+        public bool UseMultithreading;
+        public bool UseBurst;
         public float Speed;
-        protected override ISystem System => new RotateSystemParallel();
+
+        protected override ISystem System => UseMultithreading ? new RotateSystemParallel() : new RotateSystem();
 
         public class RotateSystem : ComponentSystem<PlayerMovementRotate>
         {
@@ -52,7 +55,7 @@ namespace ECT.Samples.Platformer
 
             public override void OnComplete(ParallelData data) => transform.rotation = data.Transform.rotation;
 
-            public override void Schedule(NativeArray<ParallelData> dataArray) => API.ParallelJobExecute(dataArray).Run();
+            public override void Schedule(NativeArray<ParallelData> dataArray) => API.ParallelJobExecute(dataArray).Run(Component.UseBurst);
         }
 
         public struct ParallelData : IParallelData<ParallelData>
