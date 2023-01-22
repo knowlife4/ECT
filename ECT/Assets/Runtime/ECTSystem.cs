@@ -4,7 +4,8 @@ namespace ECT
     {
         public MyReference Reference { get; private set; }
 
-        public virtual ECTValidation[] Validations => System.Array.Empty<ECTValidation>();
+        protected virtual ECTValidation[] Validations => System.Array.Empty<ECTValidation>();
+        public ECTValidation[] GetValidations() => Validations;
 
         protected virtual void OnInitialize() {}
         public void Initialize() => OnInitialize();
@@ -15,6 +16,7 @@ namespace ECT
         public void SetReference(IReference reference) => Reference = (MyReference)reference;
 
         public ECTValidation QuerySystem<FindSystem>(out FindSystem find) where FindSystem : class, ISystem => Root.QuerySystem(out find);
+        public ECTValidation Validate<T>(T input, out T output) where T : class => ECTValidation.Validate(input, out output);
 
         public MyComponent Component => Reference.Component as MyComponent;
         public MyRoot Root => Reference.Root as MyRoot;
@@ -23,7 +25,7 @@ namespace ECT
 
     public interface ISystem
     {
-        public ECTValidation[] Validations { get; }
+        public ECTValidation[] GetValidations();
         public void Initialize();
         public void Update();
         public void SetReference(IReference reference);

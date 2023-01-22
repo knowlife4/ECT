@@ -34,7 +34,7 @@ namespace ECT
                 ISystem system = reference.System;
                 bool passed = true;
 
-                foreach (var validation in system.Validations)
+                foreach (var validation in system.GetValidations())
                 {
                     if(validation.Successful == true) continue;
                     passed = false;

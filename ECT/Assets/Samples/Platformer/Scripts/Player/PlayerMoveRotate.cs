@@ -36,10 +36,10 @@ namespace ECT.Samples.Platformer
             Transform transform;
             Transform target;
 
-            public override ECTValidation[] Validations => new[]
+            protected override ECTValidation[] Validations => new[]
             {
-                ECTValidation.Validate(Root.transform, out transform),
-                ECTValidation.Validate(Root.Target, out target)
+                Validate(Root.transform, out transform),
+                Validate(Root.Target, out target)
             };
 
             public override void UpdateData(ref ParallelData data)
