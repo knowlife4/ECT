@@ -10,8 +10,6 @@ namespace ECT.Parallel
     where MyParent : class, IParent
     where MyData : unmanaged, IParallelData<MyData>
     {
-        public bool Execute { get; private set; }
-
         static internal ECTParallelScheduler<MyData> scheduler = new();
         private MyData data;
 
@@ -27,11 +25,8 @@ namespace ECT.Parallel
             }
         }
 
-        protected sealed override void OnInitialize() => scheduler.Schedule(this);
         protected sealed override void OnUpdate()
         {
-            Execute = true;
-
             UpdateData(ref data);
 
             scheduler.Update(this);
@@ -40,11 +35,7 @@ namespace ECT.Parallel
         public abstract void UpdateData(ref MyData data);
 
         public abstract void OnComplete(MyData data);
-        public void OnComplete()
-        {
-            Execute = false;
-            OnComplete(data);
-        }
+        public void OnComplete() => OnComplete(data);
 
         public abstract void Schedule(NativeArray<MyData> dataArray);
         public void Schedule(object dataArrayObject) => Schedule((NativeArray<MyData>)dataArrayObject);
@@ -52,7 +43,6 @@ namespace ECT.Parallel
 
     public interface IParallelSystem
     {
-        public bool Execute { get; }
         public object Data { get; set; }
         public void Schedule (object dataArrayObject);
         public void OnComplete ();
