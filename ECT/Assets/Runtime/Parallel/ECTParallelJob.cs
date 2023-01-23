@@ -56,7 +56,7 @@ namespace ECT.Parallel
             [BurstCompile(CompileSynchronously = true)]
             public struct ECTParallelJobBurst : IJobParallelFor
             {
-                public NativeArray<MyData> DataArray;
+                [NativeDisableParallelForRestriction] public NativeArray<MyData> DataArray;
 
                 public void Execute(int index)
                 {
@@ -66,7 +66,7 @@ namespace ECT.Parallel
 
             public struct ECTParallelJob : IJobParallelFor
             {
-                public NativeArray<MyData> DataArray;
+                [NativeDisableParallelForRestriction] public NativeArray<MyData> DataArray;
 
                 public void Execute(int index)
                 {
