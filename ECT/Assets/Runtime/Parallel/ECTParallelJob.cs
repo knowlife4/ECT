@@ -7,7 +7,7 @@ namespace ECT.Parallel
 {
     public interface IParallelData<MyData> where MyData : unmanaged, IParallelData<MyData>
     {
-        public MyData Execute();
+        public MyData Execute(NativeArray<MyData> DataArray);
     }
 
     public static class API
@@ -60,7 +60,7 @@ namespace ECT.Parallel
 
                 public void Execute(int index)
                 {
-                    DataArray[index] = DataArray[index].Execute();
+                    DataArray[index] = DataArray[index].Execute(DataArray);
                 }
             }
 
@@ -70,7 +70,7 @@ namespace ECT.Parallel
 
                 public void Execute(int index)
                 {
-                    DataArray[index] = DataArray[index].Execute();
+                    DataArray[index] = DataArray[index].Execute(DataArray);
                 }
             }
         }
