@@ -7,7 +7,8 @@ namespace ECT.Parallel
     public class ECTParallelScheduler<MyData>
     where MyData : unmanaged, IParallelData<MyData>
     {
-        internal HashSet<IParallelSystem> systems = new();
+        HashSet<IParallelSystem> systems = new();
+        List<MyData> currentData = new();
 
         public void Schedule (IParallelSystem system)
         {
@@ -15,30 +16,33 @@ namespace ECT.Parallel
             systems.Add(system);
         }
 
-        List<MyData> currentData = new();
+        IParallelSystem firstSystem = null;
+
+        public void Update (IParallelSystem current)
+        {
+            if(firstSystem == current) Execute(current);
+            firstSystem ??= current;
+        }
 
         NativeArray<MyData> nativeJobData;
 
-        public void Execute(IParallelSystem current)
+        void Execute(IParallelSystem current)
         {
-            if(systems.Count == 0) return;
-
             foreach (var system in systems)
             {
                 if(!system.Execute) return;
                 currentData.Add((MyData)system.Data);
             }
-            
-            if(currentData.Count == 0) return;
 
             nativeJobData = new(currentData.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             nativeJobData.CopyFrom(currentData.ToArray());
 
             current.Schedule(nativeJobData);
-            
+
             var iterator = 0;
             foreach (var system in systems)
             {
+                if(!system.Execute) return;
                 system.Data = nativeJobData[iterator];
                 system.OnComplete();
                 iterator++;
@@ -46,6 +50,7 @@ namespace ECT.Parallel
 
             nativeJobData.Dispose();
             currentData.Clear();
+            firstSystem = null;
         }
     }
 }

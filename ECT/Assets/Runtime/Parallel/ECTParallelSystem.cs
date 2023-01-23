@@ -34,13 +34,7 @@ namespace ECT.Parallel
 
             UpdateData(ref data);
 
-            if (Root is not IEntity entity) return;
-            
-            IEntity[] entities = entity.GetAll();
-
-            if(entities.Length == 0 || entity != entities[^1]) return;
-
-            scheduler.Execute(this);
+            scheduler.Update(this);
         }
 
         public abstract void UpdateData(ref MyData data);
