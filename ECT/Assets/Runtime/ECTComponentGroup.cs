@@ -3,7 +3,11 @@ using UnityEngine;
 
 namespace ECT
 {
-    public abstract class ECTComponentGroup<MyRoot, MyParent, MyComponent, MyComponentGroup> : ECTComponent<MyRoot, MyParent, MyComponent>, IParent where MyRoot : class, IRoot where MyParent : class, IParent where MyComponent : class, IComponent where MyComponentGroup : class, IComponent, IParent
+    public abstract class ECTComponentGroup<MyRoot, MyParent, MyComponent, MyComponentGroup> : ECTComponent<MyRoot, MyParent, MyComponent>, IParent
+    where MyRoot : class, IRoot
+    where MyParent : class, IParent
+    where MyComponent : class, IComponent
+    where MyComponentGroup : class, IComponent, IParent
     {
         public ECTBranch<ChildComponent> Components;
 

@@ -4,45 +4,21 @@ namespace ECT
 {
     public class ECTReferenceBranch : IReferenceBranch
     {
-        public ECTReferenceBranch(IComponent[] components)
-        {
-            Components = components;
-        }
+        public ECTReferenceBranch(IComponent[] components) => Components = components;
 
         public IComponent[] Components { get; }
-        
         public IReference[] References { get; private set; }
 
         public ECTAction OnPreUpdate { get; }
         public ECTAction OnPostUpdate { get; }
 
-        void CreateReferences (IParent root, IParent parent)
+        public void Update (IRoot root, IParent parent)
         {
-            List<IReference> references = new();
-            foreach (var component in Components)
-            {
-                references.Add(component.CreateReference(root, parent));
-            }
+            if(References == null || Components.Length != References.Length) SetupReferences(root, parent);
 
-            References = references.ToArray();
-        }
-
-        void UpdateReferences ()
-        {
-            foreach (var reference in References)
-            {
-                ISystem system = reference.System;
-                bool passed = true;
-
-                foreach (var validation in system.GetValidations())
-                {
-                    if(validation.Successful == true) continue;
-                    passed = false;
-                    break;
-                }
-
-                if(passed) reference.System.Update();
-            }
+            OnPreUpdate.Execute();
+            UpdateReferences();
+            OnPostUpdate.Execute();
         }
 
         public FindSystem Get<FindSystem>() where FindSystem : class, ISystem
@@ -61,16 +37,52 @@ namespace ECT
         public ECTValidation QuerySystem<FindSystem> (out FindSystem find) where FindSystem : class, ISystem
         {
             find = Get<FindSystem>();
-            return new ECTValidation(find != null);
+            return new ECTValidation(Get<FindSystem>() != null);
         }
 
-        public void Update (IParent root, IParent parent)
+        void SetupReferences (IRoot root, IParent parent)
         {
-            if(References == null || Components.Length != References.Length) CreateReferences(root, parent);
+            References = CreateReferences(root, parent);
 
-            OnPreUpdate.Execute();
-            UpdateReferences();
-            OnPostUpdate.Execute();
+            InitializeReferences();
+        }
+
+        IReference[] CreateReferences (IRoot root, IParent parent)
+        {
+            List<IReference> references = new();
+            foreach (var component in Components)
+            {
+                references.Add(component.CreateReference(root, parent));
+            }
+            return references.ToArray();
+        }
+
+        void InitializeReferences ()
+        {
+            foreach (var reference in References)
+            {
+                InitializeReference(reference);
+            }
+        }
+
+        void UpdateReferences ()
+        {
+            foreach (var reference in References)
+            {
+                UpdateReference(reference);
+            }
+        }
+
+        void InitializeReference (IReference reference)
+        {
+            ISystem system = reference.System;
+            if(system.IsValid()) system.Initialize();
+        }
+
+        void UpdateReference (IReference reference)
+        {
+            ISystem system = reference.System;
+            if(system.IsValid()) system.Update();
         }
     }
 

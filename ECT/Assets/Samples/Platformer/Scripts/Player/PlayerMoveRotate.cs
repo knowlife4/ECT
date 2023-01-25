@@ -68,11 +68,6 @@ namespace ECT.Samples.Platformer
 
             public ParallelData Execute(NativeArray<ParallelData> dataArray)
             {
-                foreach (var item in dataArray)
-                {
-                    
-                }
-
                 float3 direction = Target.position - Transform.position;
 
                 float rotationSpeed = Speed * DeltaTime;

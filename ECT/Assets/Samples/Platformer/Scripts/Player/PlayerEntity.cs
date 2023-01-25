@@ -8,7 +8,6 @@ namespace ECT.Samples.Platformer
 
         public void Update()
         {
-            if(Vector3.Distance(transform.position, Target.position) > 10) return;
             UpdateChildren();
         }
     }
