@@ -12,7 +12,7 @@ namespace ECT
         IReferenceBranch IRoot.Children => Children;
 
         private static ECTEntityGroup<MyEntity> entityGroup;
-        static ECTEntityGroup<MyEntity> EntityGroup => entityGroup ??= new();
+        public static ECTEntityGroup<MyEntity> EntityGroup => entityGroup ??= new();
 
         public void OnEnable() => EntityGroup.Tag(this as MyEntity);
         public void OnDisable() => EntityGroup.Untag(this as MyEntity);
