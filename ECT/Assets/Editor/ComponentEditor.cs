@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace ECT.UnityEditor
 {
-    [CustomPropertyDrawer(typeof(ECTComponent<,,>), true)]
+    [CustomPropertyDrawer(typeof(ECTComponent<,>), true)]
     public class ComponentEditor : PropertyDrawer
     {
         Editor editor;

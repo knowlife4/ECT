@@ -1,21 +1,12 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ECT
 {
     public struct ECTAction
     {
         private List<Action> callbacks;
-
-        public List<Action> Callbacks
-        {
-            get
-            {
-                callbacks ??= new();
-                return callbacks;
-            }
-        }
+        List<Action> Callbacks => callbacks ??= new();
 
         public bool Contains(Action function) => Callbacks.Contains(function);
 
@@ -33,13 +24,12 @@ namespace ECT
 
         public void Execute()
         {
-            foreach (var callback in Callbacks)
+            foreach (Action callback in Callbacks)
             {
                 callback?.Invoke();
             }
         }
     }
-
     public interface IAction
     {
         public void Execute();

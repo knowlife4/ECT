@@ -1,56 +1,51 @@
+using System;
+using System.Linq;
+using ECT.Parallel;
+
 namespace ECT
 {
-    public abstract class ECTSystem<MyReference, MyComponent, MyRoot, MyParent> : ISystem, IReferenceParent
-    where MyReference : IReference
-    where MyComponent : class, IComponent
-    where MyRoot : class, IRoot
-    where MyParent : class, IParent
+    public abstract class ECTSystem<TRoot, TParent, TComponent, TSystemData> : ISystem
+        where TParent : class, IParent
+        where TRoot : class, IRoot
+        where TComponent : class, IComponent
+        where TSystemData : ECTSystemData
     {
-        public MyReference Reference { get; private set; }
+        public TSystemData Data { get; private set; }
 
+        protected TRoot Root => Data.Root as TRoot;
+
+        protected TParent Parent => Data.Parent as TParent;
+        protected TComponent Component => Data.Component as TComponent;
+
+        public void SetData(ECTSystemData data) => Data = (TSystemData)data;
+
+        public ECTValidation IsValid() => new(Validations.All(validation => validation.Successful == true));
         protected virtual ECTValidation[] Validations => System.Array.Empty<ECTValidation>();
-        public ECTValidation[] GetValidations() => Validations;
 
-        public bool IsValid()
-        {
-            bool passed = true;
-            foreach (var validation in GetValidations())
-            {
-                if(validation.Successful == true) continue;
-                passed = false;
-                break;
-            }
-
-            return passed;
-        }
-
-        protected virtual void OnInitialize() {}
         public void Initialize() => OnInitialize();
+        protected virtual void OnInitialize() { }
 
-        protected virtual void OnUpdate() {}
         public void Update() => OnUpdate();
+        protected abstract void OnUpdate();
 
-        public void SetReference(IReference reference) => Reference = (MyReference)reference;
-
-        public ECTValidation QuerySystem<FindSystem>(out FindSystem find) where FindSystem : class, ISystem => Root.QuerySystem(out find);
+        public ECTValidation QuerySystem<TSystem>(out TSystem find) where TSystem : class, ISystem => Root.QuerySystem(out find);
         public ECTValidation Validate<T>(T input, out T output) where T : class => ECTValidation.Validate(input, out output);
-        public ECTValidation Subscribe(ECTAction ectAction, System.Action action)
+        public ECTValidation Subscribe(ECTAction ectAction, Action action)
         {
             ectAction.Subscribe(action);
             return new(true);
         }
-
-        public MyComponent Component => Reference.Component as MyComponent;
-        public MyRoot Root => Reference.Root as MyRoot;
-        public MyParent Parent => Reference.Parent as MyParent;
+        
+        public abstract class Parallel<TParallelData> : ECTParallelSystem<TRoot, TParent, TComponent, TSystemData, TParallelData> 
+        where TParallelData : unmanaged, IParallelData<TParallelData> { }
     }
 
     public interface ISystem
     {
-        public ECTValidation[] GetValidations();
-        public bool IsValid();
+        public ECTValidation IsValid();
+        
         public void Initialize();
         public void Update();
-        public void SetReference(IReference reference);
+        public void SetData(ECTSystemData data);
     }
 }

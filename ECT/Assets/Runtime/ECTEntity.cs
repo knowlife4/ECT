@@ -1,34 +1,39 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace ECT
 {
-    public abstract class ECTEntity<MyEntity> : MonoBehaviour, IEntity, IReferenceParent where MyEntity : class, IEntity, IReferenceParent
+    public abstract class ECTEntity<TEntity> : MonoBehaviour, IEntity where TEntity : class, IEntity
     {
-        public ECTBranch<ECTComponent<MyEntity, MyEntity, EntityComponent>> ComponentBranch;
-    
-        private ECTReferenceBranch children;
-        public ECTReferenceBranch Children => children ??= new(ComponentBranch.Components);
-        IReferenceBranch IRoot.Children => Children;
+        public static TEntity[] All => Group.Entities;
+        
+        static ECTEntityGroup<TEntity> group;
+        static ECTEntityGroup<TEntity> Group => group ??= new();
 
-        private static ECTEntityGroup<MyEntity> entityGroup;
-        public static ECTEntityGroup<MyEntity> EntityGroup => entityGroup ??= new();
+        [SerializeField]
+        ECTComponentGroup<ECTComponent<TEntity, TEntity>> componentGroup;
 
-        public void OnEnable() => EntityGroup.Tag(this as MyEntity);
-        public void OnDisable() => EntityGroup.Untag(this as MyEntity);
+        ECTSystemDataGroup dataGroup;
+        public ECTSystemDataGroup DataGroup => dataGroup ??= new ECTSystemDataGroup(componentGroup.Components);
+        
+        public void UpdateSystems() => DataGroup.Update(this, this);
 
-        public abstract class EntityComponent : ECTComponent<MyEntity, MyEntity, EntityComponent> { }
+        public TSystem GetSystem<TSystem>() where TSystem : class, ISystem => dataGroup.GetSystem<TSystem>();
+        
+        public ECTValidation QuerySystem<TSystem>(out TSystem system) where TSystem : class, ISystem
+        {
+            system = GetSystem<TSystem>();
 
-        public ECTValidation QuerySystem<FindSystem>(out FindSystem find) where FindSystem : class, ISystem => Children.QuerySystem(out find);
+            return new(system != null);
+        }
 
-        public void UpdateChildren() => Children.Update(this, this);
-
-        public static MyEntity[] All => entityGroup.Entities;
-        public IEntity[] GetAll() => All;
+        void OnEnable() => Group.Tag(this as TEntity);
+        void OnDisable() => Group.UnTag(this as TEntity);
+        
+        public abstract class Component : ECTComponent<TEntity, TEntity> { }
     }
 
     public interface IEntity : IRoot
     {
-        public IEntity[] GetAll ();
+        
     }
 }

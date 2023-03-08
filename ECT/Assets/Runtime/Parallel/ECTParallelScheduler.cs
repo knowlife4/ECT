@@ -4,11 +4,10 @@ using Unity.Collections;
 
 namespace ECT.Parallel
 {
-    public class ECTParallelScheduler<MyData>
-    where MyData : unmanaged, IParallelData<MyData>
+    public class ECTParallelScheduler<TParallelData> where TParallelData : unmanaged, IParallelData<TParallelData>
     {
         HashSet<IParallelSystem> currentSystems = new();
-        List<MyData> currentData = new();
+        List<TParallelData> currentData = new();
     
         public void Update (IParallelSystem current)
         {
@@ -21,7 +20,7 @@ namespace ECT.Parallel
             currentSystems.Add(current);
         }
 
-        NativeArray<MyData> nativeJobData;
+        NativeArray<TParallelData> nativeJobData;
 
         void Execute(IParallelSystem current)
         {
@@ -29,7 +28,7 @@ namespace ECT.Parallel
 
             foreach (var system in currentSystems)
             {
-                currentData.Add((MyData)system.Data);
+                currentData.Add((TParallelData)system.ParallelData);
             }
 
             nativeJobData = new(currentData.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -40,7 +39,7 @@ namespace ECT.Parallel
             var iterator = 0;
             foreach (var system in currentSystems)
             {
-                system.Data = nativeJobData[iterator];
+                system.ParallelData = nativeJobData[iterator];
                 system.OnComplete();
                 iterator++;
             }

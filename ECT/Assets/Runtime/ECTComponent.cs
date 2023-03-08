@@ -1,42 +1,36 @@
+using System;
+using System.Linq.Expressions;
 using UnityEngine;
 
 namespace ECT
 {
-    public abstract class ECTComponent<MyRoot, MyParent, MyComponent> : ScriptableObject, IComponent
-    where MyRoot : class, IRoot
-    where MyParent : class, IParent
-    where MyComponent : class, IComponent
+    public abstract class ECTComponent<TRoot, TParent> : ScriptableObject, IComponent
+        where TRoot : class, IRoot
+        where TParent : class, IParent
     {
-        protected MyComponent ThisComponent => this as MyComponent;
-
-        protected abstract ISystem System { get; }
-        public ISystem CreateSystem() => System;
-
-        protected virtual IReference CreateReference (MyRoot root, MyParent parent, ISystem system) => new ComponentReference(ThisComponent, root, parent, system);
-        public IReference CreateReference(IParent root, IParent parent)
+        protected ECTComponent() => SystemConstructor = new(ComponentSystemAttribute.FindComponentSystemType(GetType()));
+        ECTDynamicConstructor<ISystem> SystemConstructor { get; }
+        
+        protected virtual ISystem CreateSystem() => SystemConstructor.Create();
+        
+        public virtual ECTSystemData CreateSystemData(IRoot root, IParent parent)
         {
-            ISystem system = System;
-            IReference reference = CreateReference((MyRoot)root, (MyParent)parent, system);
-            system.SetReference(reference);
+            ISystem system = CreateSystem();
+            ECTSystemData data = CreateSystemData((TRoot)root, (TParent)parent, system);
+            system.SetData(data);
 
-            return reference;
+            return data;
         }
 
-        public abstract class ComponentSystem<Component> : ECTSystem<ComponentReference, Component, MyRoot, MyParent> where Component : class, IComponent {}
+        protected virtual ECTSystemData CreateSystemData(TRoot root, TParent parent, ISystem system) => new ECTSystemData(root, parent, this, system);
 
-        public abstract class ComponentParallelSystem<Component, MyData> : Parallel.ECTParallelSystem<ComponentReference, Component, MyRoot, MyParent, MyData> where Component : class, IComponent where MyData : unmanaged, Parallel.IParallelData<MyData> {}
+        public abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ECTSystemData> where TComponent : class, IComponent { }
 
-        public class ComponentReference : ECTReference<MyRoot, MyParent, MyComponent>
-        {
-            public ComponentReference(MyComponent reference, MyRoot root, MyParent parent, ISystem system) : base(reference, root, parent, system) {}
-        }
-
-        public abstract class ComponentGroup : ECTComponentGroup<MyRoot, MyParent, MyComponent, ComponentGroup> {}
+        public abstract class Parent : ECTComponentParent<TRoot, TParent, Parent> { }
     }
 
     public interface IComponent
     {
-        public ISystem CreateSystem();
-        public IReference CreateReference(IParent root, IParent parent);
+        public ECTSystemData CreateSystemData(IRoot root, IParent parent);
     }
 }

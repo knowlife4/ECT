@@ -3,47 +3,43 @@ using Unity.Collections;
 
 namespace ECT.Parallel
 {
-    public abstract class ECTParallelSystem<MyReference, MyComponent, MyRoot, MyParent, MyData> : ECTSystem<MyReference, MyComponent, MyRoot, MyParent>, IParallelSystem
-    where MyReference : IReference
-    where MyComponent : class, IComponent
-    where MyRoot : class, IRoot
-    where MyParent : class, IParent
-    where MyData : unmanaged, IParallelData<MyData>
+    public abstract class ECTParallelSystem<TRoot, TParent, TComponent, TSystemData, TParallelData> : ECTSystem<TRoot, TParent, TComponent, TSystemData>, IParallelSystem
+    where TRoot : class, IRoot
+    where TParent : class, IParent
+    where TComponent : class, IComponent
+    where TSystemData : ECTSystemData
+    where TParallelData : unmanaged, IParallelData<TParallelData>
     {
-        static internal ECTParallelScheduler<MyData> scheduler = new();
-        private MyData data;
+        static ECTParallelScheduler<TParallelData> Scheduler { get; } = new();
 
-        public object Data
+        private TParallelData parallelData;
+
+        public object ParallelData
         {
-            get
-            {
-                return data;
-            }
-            set
-            {
-                data = (MyData)value;
-            }
+            get => parallelData;
+            set => parallelData = (TParallelData) value;
         }
 
         protected sealed override void OnUpdate()
         {
-            UpdateData(ref data);
+            PopulateData(ref parallelData);
 
-            scheduler.Update(this);
+            Scheduler.Update(this);
         }
 
-        public abstract void UpdateData(ref MyData data);
+        protected abstract void PopulateData(ref TParallelData data);
+        
+        public void OnComplete() => ExtractData(parallelData);
+        protected abstract void ExtractData(TParallelData data);
+        
+        public void Schedule(object dataArrayObject) => Schedule((NativeArray<TParallelData>)dataArrayObject);
 
-        public abstract void OnComplete(MyData data);
-        public void OnComplete() => OnComplete(data);
-
-        public abstract void Schedule(NativeArray<MyData> dataArray);
-        public void Schedule(object dataArrayObject) => Schedule((NativeArray<MyData>)dataArrayObject);
+        protected abstract void Schedule(NativeArray<TParallelData> dataArray);
     }
 
     public interface IParallelSystem
     {
-        public object Data { get; set; }
+        public object ParallelData { get; set; }
         public void Schedule (object dataArrayObject);
         public void OnComplete ();
     }

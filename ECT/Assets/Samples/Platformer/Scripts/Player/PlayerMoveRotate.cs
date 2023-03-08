@@ -4,28 +4,30 @@ using Unity.Burst;
 using ECT.Parallel;
 using Unity.Jobs;
 using Unity.Collections;
+using NotImplementedException = System.NotImplementedException;
 
 namespace ECT.Samples.Platformer
 {
     [CreateAssetMenu]
-    public class PlayerMovementRotate : PlayerMovement.ChildComponent
+    public class PlayerMovementRotate : PlayerMovement.Component
     {
         public bool UseMultithreading;
         public bool UseBurst;
         public float Speed;
 
-        protected override ISystem System => UseMultithreading ? new RotateSystemParallel() : new RotateSystem();
-
-        public class RotateSystem : ComponentSystem<PlayerMovementRotate>
+        protected override ISystem CreateSystem() => UseMultithreading ? new ParallelSystem() : new System();
+        
+        public class System : System<PlayerMovementRotate>
         {
             protected override void OnUpdate()
             {
-                float3 direction = Root.Target.position - Root.transform.position;
+                Transform transform = Root.transform;
+                float3 direction = Root.Target.position - transform.position;
 
                 float rotationSpeed = Component.Speed * Time.deltaTime;
                 float3 up = new(0f, 1f, 0f);
 
-                Root.transform.rotation = math.slerp(Root.transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
+                transform.rotation = math.slerp(transform.rotation, quaternion.LookRotationSafe(direction, up), rotationSpeed);
 
                 for (int i = 0; i < 10000; i++)
                 {
@@ -34,7 +36,7 @@ namespace ECT.Samples.Platformer
             }
         }
 
-        public class RotateSystemParallel : ComponentParallelSystem<PlayerMovementRotate, ParallelData>
+        public class ParallelSystem : System<PlayerMovementRotate>.Parallel<Data>
         {
             Transform transform;
             Transform target;
@@ -45,7 +47,7 @@ namespace ECT.Samples.Platformer
                 Validate(Root.Target, out target)
             };
 
-            public override void UpdateData(ref ParallelData data)
+            protected override void PopulateData(ref Data data)
             {
                 data.Transform = transform;
                 data.Target = target;
@@ -53,12 +55,12 @@ namespace ECT.Samples.Platformer
                 data.DeltaTime = Time.deltaTime;
             }
 
-            public override void OnComplete(ParallelData data) => transform.rotation = data.Transform.rotation;
+            protected override void ExtractData(Data data) => transform.rotation = data.Transform.rotation;
 
-            public override void Schedule(NativeArray<ParallelData> dataArray) => API.ParallelJobExecute(dataArray).Run(Component.UseBurst);
+            protected override void Schedule(NativeArray<Data> dataArray) => ParallelConfigAPI.Create(dataArray).Run(Component.UseBurst);
         }
 
-        public struct ParallelData : IParallelData<ParallelData>
+        public struct Data : IParallelData<Data>
         {
             public ECTParallelTransform Transform;
             public ECTParallelTransform Target;
@@ -66,7 +68,7 @@ namespace ECT.Samples.Platformer
             public float Speed;
             public float DeltaTime;
 
-            public ParallelData Execute(NativeArray<ParallelData> dataArray)
+            public Data Execute(NativeArray<Data> dataArray)
             {
                 float3 direction = Target.position - Transform.position;
 

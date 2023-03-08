@@ -7,8 +7,8 @@ using UnityEngine.UIElements;
 
 namespace ECT.UnityEditor
 {
-    [CustomPropertyDrawer(typeof(ECTBranch<>), true)]
-    public class BranchEditor : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ECTComponentGroup<>), true)]
+    public class ComponentGroupEditor : PropertyDrawer
     {
         ReorderableList componentList;
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

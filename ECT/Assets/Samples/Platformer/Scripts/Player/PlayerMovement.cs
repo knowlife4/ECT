@@ -3,10 +3,12 @@ using UnityEngine;
 namespace ECT.Samples.Platformer
 {
     [CreateAssetMenu]
-    public class PlayerMovement : PlayerEntity.EntityComponent.ComponentGroup
+    public class PlayerMovement : PlayerEntity.Component.Parent
     {
-        protected override ISystem System => new MovementSystem();
-
-        public class MovementSystem : ComponentSystem<PlayerMovement> {}
+        [ComponentSystem]
+        public class System : System<PlayerMovement>
+        {
+            
+        }
     }
 }

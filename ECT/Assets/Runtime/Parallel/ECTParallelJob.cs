@@ -5,25 +5,25 @@ using Unity.Mathematics;
 
 namespace ECT.Parallel
 {
-    public interface IParallelData<MyData> where MyData : unmanaged, IParallelData<MyData>
+    public interface IParallelData<TData> where TData : unmanaged, IParallelData<TData>
     {
-        public MyData Execute(NativeArray<MyData> DataArray);
+        public TData Execute(NativeArray<TData> DataArray);
     }
 
-    public static class API
+    public static class ParallelConfigAPI
     {
-        public static Config<MyData> ParallelJobExecute<MyData> (NativeArray<MyData> dataArray) where MyData : unmanaged, IParallelData<MyData>
+        public static ParallelConfig<TData> Create<TData> (NativeArray<TData> dataArray) where TData : unmanaged, IParallelData<TData>
         {
-            return new Config<MyData>
+            return new ParallelConfig<TData>
             {
                 DataArray = dataArray
             };
         }
     }
 
-    public struct Config<MyData> where MyData : unmanaged, IParallelData<MyData>
+    public struct ParallelConfig<TData> where TData : unmanaged, IParallelData<TData>
     {
-        public NativeArray<MyData> DataArray;
+        public NativeArray<TData> DataArray;
 
         public void Run(bool burst = false)
         {
@@ -56,7 +56,7 @@ namespace ECT.Parallel
             [BurstCompile(CompileSynchronously = true)]
             public struct ECTParallelJobBurst : IJobParallelFor
             {
-                [NativeDisableParallelForRestriction] public NativeArray<MyData> DataArray;
+                [NativeDisableParallelForRestriction] public NativeArray<TData> DataArray;
 
                 public void Execute(int index)
                 {
@@ -66,7 +66,7 @@ namespace ECT.Parallel
 
             public struct ECTParallelJob : IJobParallelFor
             {
-                [NativeDisableParallelForRestriction] public NativeArray<MyData> DataArray;
+                [NativeDisableParallelForRestriction] public NativeArray<TData> DataArray;
 
                 public void Execute(int index)
                 {
