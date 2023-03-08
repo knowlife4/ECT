@@ -1,0 +1,6 @@
+using ECT;
+
+public class #SCRIPTNAME# : ECTEntity<#SCRIPTNAME#>
+{
+    void Update() => UpdateSystems();
+}

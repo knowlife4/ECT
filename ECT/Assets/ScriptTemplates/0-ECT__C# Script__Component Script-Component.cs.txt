@@ -1,0 +1,13 @@
+using ECT;
+
+public class #SCRIPTNAME# : PARENT.Component
+{
+    [ComponentSystem]
+    public class System : System<#SCRIPTNAME#>
+    {
+        protected override void OnUpdate()
+        {
+            #NOTRIM#
+        }
+    }
+}

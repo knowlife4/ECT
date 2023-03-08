@@ -1,10 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine;
-using Unity.Burst;
 using ECT.Parallel;
-using Unity.Jobs;
 using Unity.Collections;
-using NotImplementedException = System.NotImplementedException;
 
 namespace ECT.Samples.Platformer
 {
@@ -15,14 +12,31 @@ namespace ECT.Samples.Platformer
         public bool UseBurst;
         public float Speed;
 
+        [SceneReference]
+        public struct SceneReference : ISceneReference
+        {
+            public Transform Target;
+            public ECTValidation[] Validations => new ECTValidation[]
+            {
+                new(Target != null)
+            };
+        }
+
         protected override ISystem CreateSystem() => UseMultithreading ? new ParallelSystem() : new System();
         
         public class System : System<PlayerMovementRotate>
         {
+            SceneReference reference;
+            
+            protected override ECTValidation[] Validations => new[]
+            {
+                QueryReference(out reference)
+            };
+
             protected override void OnUpdate()
             {
                 Transform transform = Root.transform;
-                float3 direction = Root.Target.position - transform.position;
+                float3 direction = reference.Target.position - transform.position;
 
                 float rotationSpeed = Component.Speed * Time.deltaTime;
                 float3 up = new(0f, 1f, 0f);
@@ -39,18 +53,19 @@ namespace ECT.Samples.Platformer
         public class ParallelSystem : System<PlayerMovementRotate>.Parallel<Data>
         {
             Transform transform;
-            Transform target;
+
+            SceneReference reference;
 
             protected override ECTValidation[] Validations => new[]
             {
+                QueryReference(out reference),
                 Validate(Root.transform, out transform),
-                Validate(Root.Target, out target)
             };
 
             protected override void PopulateData(ref Data data)
             {
                 data.Transform = transform;
-                data.Target = target;
+                data.Target = reference.Target;
                 data.Speed = Component.Speed;
                 data.DeltaTime = Time.deltaTime;
             }

@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+using System.Collections.Generic;
 
 namespace ECT
 {
@@ -8,6 +8,17 @@ namespace ECT
     where TComponentParent : class, IComponent, IParent
     {
         public ECTComponentGroup<ECTComponent<TRoot, TComponentParent>> ComponentGroup;
+        IComponentGroup IParent.ComponentGroup => ComponentGroup;
+
+        internal override IComponent[] GetComponents()
+        {
+            List<IComponent> components = new();
+            
+            components.AddRange(ComponentGroup.GetComponents());
+            components.Add(this);
+
+            return components.ToArray();
+        }
 
         protected override ECTSystemData CreateSystemData(TRoot root, TParent parent, ISystem system) => new ComponentParentSystemData(root, parent, this, system, ComponentGroup);
 

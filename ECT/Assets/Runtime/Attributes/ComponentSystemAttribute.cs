@@ -6,7 +6,7 @@ namespace ECT
     [AttributeUsage(AttributeTargets.Class)]
     public class ComponentSystemAttribute : Attribute
     {
-        public static Type FindComponentSystemType(Type componentType)
+        public static Type Find(Type componentType)
         {
             Type[] nested = componentType.GetNestedTypes();
 

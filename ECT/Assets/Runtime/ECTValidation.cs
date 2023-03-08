@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace ECT
 {
     public struct ECTValidation
@@ -9,6 +11,8 @@ namespace ECT
             output = input;
             return new ECTValidation(input != null);
         }
+        
+        public static ECTValidation Validate(params ECTValidation[] validations) => new(validations.All(validation => validation.Successful == true));
 
         public bool Successful { get; }
     }

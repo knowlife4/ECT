@@ -5,11 +5,21 @@ using UnityEngine;
 namespace ECT
 {
     public abstract class ECTComponent<TRoot, TParent> : ScriptableObject, IComponent
-        where TRoot : class, IRoot
-        where TParent : class, IParent
+    where TRoot : class, IRoot
+    where TParent : class, IParent
     {
-        protected ECTComponent() => SystemConstructor = new(ComponentSystemAttribute.FindComponentSystemType(GetType()));
+        protected ECTComponent()
+        {
+            Type type = GetType();
+            
+            SystemConstructor = new(ComponentSystemAttribute.Find(type));
+            SceneReferenceConstructor = new(SceneReferenceAttribute.Find(type));
+        }
+
         ECTDynamicConstructor<ISystem> SystemConstructor { get; }
+
+        IDynamicConstructor IComponent.SceneReferenceConstructor => SceneReferenceConstructor;
+        ECTDynamicConstructor<ISceneReference> SceneReferenceConstructor { get; }
         
         protected virtual ISystem CreateSystem() => SystemConstructor.Create();
         
@@ -27,10 +37,15 @@ namespace ECT
         public abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ECTSystemData> where TComponent : class, IComponent { }
 
         public abstract class Parent : ECTComponentParent<TRoot, TParent, Parent> { }
+        
+        internal virtual IComponent[] GetComponents() => new[] { this };
+        IComponent[] IReferenceComponent.GetComponents() => GetComponents();
     }
 
-    public interface IComponent
+    public interface IComponent : IReferenceComponent
     {
+        public IDynamicConstructor SceneReferenceConstructor { get; }
+
         public ECTSystemData CreateSystemData(IRoot root, IParent parent);
     }
 }

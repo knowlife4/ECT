@@ -19,7 +19,7 @@ namespace ECT
 
         public void SetData(ECTSystemData data) => Data = (TSystemData)data;
 
-        public ECTValidation IsValid() => new(Validations.All(validation => validation.Successful == true));
+        public ECTValidation IsValid() => ECTValidation.Validate(Validations);
         protected virtual ECTValidation[] Validations => System.Array.Empty<ECTValidation>();
 
         public void Initialize() => OnInitialize();
@@ -28,7 +28,10 @@ namespace ECT
         public void Update() => OnUpdate();
         protected abstract void OnUpdate();
 
-        public ECTValidation QuerySystem<TSystem>(out TSystem find) where TSystem : class, ISystem => Root.QuerySystem(out find);
+        public ECTValidation QuerySystem<TSystem>(out TSystem found) where TSystem : class, ISystem => Root.QuerySystem(out found);
+
+        public ECTValidation QueryReference<TReference>(out TReference found) where TReference : struct, ISceneReference => Root.QueryReference(out found);
+
         public ECTValidation Validate<T>(T input, out T output) where T : class => ECTValidation.Validate(input, out output);
         public ECTValidation Subscribe(ECTAction ectAction, Action action)
         {
