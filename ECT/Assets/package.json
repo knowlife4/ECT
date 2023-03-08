@@ -1,6 +1,6 @@
 {
     "name": "com.slice.ect",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "displayName": "ECT- ECS-like Modularity in Unity",
     "description": "TODO",
     "unity": "2022.2",
