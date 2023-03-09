@@ -19,20 +19,20 @@ namespace ECT.UnityEditor
             EditorGUI.BeginProperty(position, label, property);
             
             SerializedProperty references = property.FindPropertyRelative("References");
-            sceneReferenceList.DrawList(position, property, references);
-
-            sceneReferenceList.DrawEvent = DrawElement;
+            
+            for (int i = 0; i < references.arraySize; i++)
+            {
+                DrawElement(i, references);
+            }
 
             EditorGUI.EndProperty();
         }
 
-        public void DrawElement(Rect rect, int index, SerializedProperty listProperty)
+        public void DrawElement(int index, SerializedProperty listProperty)
         {
             SerializedProperty baseProp = listProperty.GetArrayElementAtIndex(index);
             string name = baseProp.managedReferenceFullTypename.Split(' ').Last().Split('.').Last();
-            
-            GUI.Label(rect, name);
-            
+
             IEnumerator enumerator = baseProp.GetEnumerator();
             
             EditorGUI.indentLevel++;
