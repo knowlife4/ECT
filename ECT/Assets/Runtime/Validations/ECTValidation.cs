@@ -7,7 +7,7 @@ namespace ECT
         public static ECTBoolValidation ValidateMany(params IValidation[] validations) => new(validations.All(validation => validation.Successful == true));
 
         
-        public static IValidation ValidateReferences<T> (params T[] inputs) where T : class
+        public static IValidation ValidateReferences (params object[] inputs)
         {
             return new ECTBoolValidation(inputs.All(reference => ValidateReference(reference).Successful));
         }
