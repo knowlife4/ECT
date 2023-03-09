@@ -442,11 +442,11 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 63393b1d372874e4da22b3634281e7e0, type: 2}
   referenceGroup:
     References:
-    - rid: 1272543082334126103
+    - rid: 1272543088898211841
   references:
     version: 2
     RefIds:
-    - rid: 1272543082334126103
+    - rid: 1272543088898211841
       type: {class: PlayerMovementRotate/SceneReference, ns: ECT.Samples.Platformer, asm: Assembly-CSharp}
       data:
         Target: {fileID: 2088425321}

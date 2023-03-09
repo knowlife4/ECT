@@ -16,11 +16,8 @@ namespace ECT.Samples.Platformer
         public struct SceneReference : ISceneReference
         {
             public Transform Target;
-            
-            public IValidation[] Validations => new IValidation[]
-            {
-                new ECTBoolValidation(Target != null)
-            };
+
+            public IValidation Validation => ECTValidation.ValidateReference(Target);
         }
 
         protected override ISystem CreateSystem() => UseMultithreading ? new ParallelSystem() : new System();

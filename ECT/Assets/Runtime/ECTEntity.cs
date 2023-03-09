@@ -52,7 +52,7 @@ namespace ECT
             TReference? found = GetReference<TReference>();
             reference = found ?? default;
 
-            return found != null ? ECTValidation.ValidateMany(reference.Validations) : new(false);
+            return found != null ? reference.Validation : new ECTBoolValidation(false);
         }
 
         public IEnumerable<IComponent> GetComponentsRecursively()
