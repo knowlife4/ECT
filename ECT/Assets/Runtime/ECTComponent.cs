@@ -41,6 +41,8 @@ namespace ECT
         {
             yield return this;
         }
+        
+        protected static ValidateReferences(params object[] references) => ECTValidation.ValidateReferences(references);
 
         public abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ECTSystemData> where TComponent : class, IComponent { }
 
