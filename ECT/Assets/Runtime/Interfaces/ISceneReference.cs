@@ -2,6 +2,6 @@ namespace ECT
 {
     public interface ISceneReference
     {
-        public ECTValidation[] Validations { get; }
+        public IValidation[] Validations { get; }
     }
 }

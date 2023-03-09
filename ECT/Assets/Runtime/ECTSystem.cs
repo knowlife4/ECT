@@ -18,8 +18,8 @@ namespace ECT
 
         public void SetData(ECTSystemData data) => Data = (TSystemData)data;
 
-        public ECTValidation IsValid() => ECTValidation.Validate(Validations);
-        protected virtual ECTValidation[] Validations => System.Array.Empty<ECTValidation>();
+        public IValidation IsValid() => ECTValidation.ValidateMany(Validations);
+        protected virtual IValidation[] Validations => System.Array.Empty<IValidation>();
 
         public void Initialize() => OnInitialize();
         protected virtual void OnInitialize() { }
@@ -27,10 +27,10 @@ namespace ECT
         public void Update() => OnUpdate();
         protected abstract void OnUpdate();
 
-        public ECTValidation QuerySystem<TSystem>(out TSystem found) where TSystem : class, ISystem => Root.QuerySystem(out found);
-        public ECTValidation QueryReference<TReference>(out TReference found) where TReference : struct, ISceneReference => Root.QueryReference(out found);
-        public ECTValidation ValidateReference<T>(T input, out T output) where T : class => ECTValidation.ValidateReference(input, out output);
-        public ECTValidation Subscribe(ECTAction ectAction, Action action)
+        public IValidation QuerySystem<TSystem>(out TSystem found) where TSystem : class, ISystem => Root.QuerySystem(out found);
+        public IValidation QueryReference<TReference>(out TReference found) where TReference : struct, ISceneReference => Root.QueryReference(out found);
+        public IValidation ValidateReference<T>(T input, out T output) where T : class => ECTValidation.ValidateReference(input, out output);
+        public ECTBoolValidation Subscribe(ECTAction ectAction, Action action)
         {
             ectAction.Subscribe(action);
             return new(true);
@@ -42,7 +42,7 @@ namespace ECT
 
     public interface ISystem
     {
-        public ECTValidation IsValid();
+        public IValidation IsValid();
         
         public void Initialize();
         public void Update();

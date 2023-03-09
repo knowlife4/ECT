@@ -16,9 +16,10 @@ namespace ECT.Samples.Platformer
         public struct SceneReference : ISceneReference
         {
             public Transform Target;
-            public ECTValidation[] Validations => new ECTValidation[]
+            
+            public IValidation[] Validations => new IValidation[]
             {
-                new(Target != null)
+                new ECTBoolValidation(Target != null)
             };
         }
 
@@ -28,7 +29,7 @@ namespace ECT.Samples.Platformer
         {
             SceneReference reference;
             
-            protected override ECTValidation[] Validations => new[]
+            protected override IValidation[] Validations => new[]
             {
                 QueryReference(out reference)
             };
@@ -56,7 +57,7 @@ namespace ECT.Samples.Platformer
 
             SceneReference reference;
 
-            protected override ECTValidation[] Validations => new[]
+            protected override IValidation[] Validations => new[]
             {
                 QueryReference(out reference),
                 ValidateReference(Root.transform, out transform),

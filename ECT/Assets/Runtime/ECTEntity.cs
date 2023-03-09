@@ -35,11 +35,11 @@ namespace ECT
             return dataGroup.GetSystem<TSystem>();
         }
 
-        public ECTValidation QuerySystem<TSystem>(out TSystem system) where TSystem : class, ISystem
+        public IValidation QuerySystem<TSystem>(out TSystem system) where TSystem : class, ISystem
         {
             system = GetSystem<TSystem>();
 
-            return new(system != null);
+            return new ECTBoolValidation(system != null);
         }
 
         public TReference? GetReference<TReference>() where TReference : struct, ISceneReference
@@ -47,12 +47,12 @@ namespace ECT
             return referenceGroup.Get<TReference>();
         }
 
-        public ECTValidation QueryReference<TReference>(out TReference reference) where TReference : struct, ISceneReference
+        public IValidation QueryReference<TReference>(out TReference reference) where TReference : struct, ISceneReference
         {
             TReference? found = GetReference<TReference>();
             reference = found ?? default;
 
-            return found != null ? ECTValidation.Validate(reference.Validations) : new(false);
+            return found != null ? ECTValidation.ValidateMany(reference.Validations) : new(false);
         }
 
         public IEnumerable<IComponent> GetComponentsRecursively()
