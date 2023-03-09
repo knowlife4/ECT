@@ -1,7 +1,9 @@
-﻿namespace ECT
+﻿using System.Collections.Generic;
+
+namespace ECT
 {
     public interface IReferenceComponent
     {
-        public IComponent[] GetComponents();
+        public IEnumerable<IComponent> GetComponentsRecursively();
     }
 }

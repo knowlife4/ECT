@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace ECT
 {
-    public struct ECTAction
+    public struct ECTAction : IAction
     {
-        private List<Action> callbacks;
-        List<Action> Callbacks => callbacks ??= new();
+        public ECTAction(params Action[] callbacks) => Callbacks = new(callbacks);
+
+        HashSet<Action> Callbacks { get; }
 
         public bool Contains(Action function) => Callbacks.Contains(function);
 

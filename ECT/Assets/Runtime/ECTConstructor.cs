@@ -3,15 +3,15 @@ using System.Linq.Expressions;
 
 namespace ECT
 {
-    public class ECTDynamicConstructor<TReturn> : IDynamicConstructor
+    public class ECTConstructor<TReturn> : IDynamicConstructor
     {
-        public ECTDynamicConstructor(Type type)
+        public ECTConstructor(Type type)
         {
             Type = type;
         }
 
         public Type Type { get; }
-        
+
         Func<TReturn> ConstructorFunc
         {
             get
@@ -27,11 +27,11 @@ namespace ECT
         void Compile()
         {
             NewExpression constructorExpression = Expression.New(Type);
-            
+
             Expression conversionExpression = Expression.Convert(constructorExpression, typeof(TReturn));
-            
+
             Expression<Func<TReturn>> lambdaExpression = Expression.Lambda<Func<TReturn>>(conversionExpression);
-            
+
             constructorFunc = lambdaExpression.Compile();
         }
 

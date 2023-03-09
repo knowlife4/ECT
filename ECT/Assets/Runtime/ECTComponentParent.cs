@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ECT
 {
@@ -7,43 +8,46 @@ namespace ECT
     where TParent : class, IParent
     where TComponentParent : class, IComponent, IParent
     {
-        public ECTComponentGroup<ECTComponent<TRoot, TComponentParent>> ComponentGroup;
-        IComponentGroup IParent.ComponentGroup => ComponentGroup;
+        [SerializeField]
+        ECTComponentGroup<ECTComponent<TRoot, TComponentParent>> componentGroup;
 
-        internal override IComponent[] GetComponents()
+        public IComponentGroup ComponentGroup => componentGroup;
+
+        public override IEnumerable<IComponent> GetComponentsRecursively()
         {
-            List<IComponent> components = new();
-            
-            components.AddRange(ComponentGroup.GetComponents());
-            components.Add(this);
+            yield return this;
 
-            return components.ToArray();
+            foreach (IComponent component in ComponentGroup.GetComponentsRecursively()) yield return component;
         }
 
-        protected override ECTSystemData CreateSystemData(TRoot root, TParent parent, ISystem system) => new ComponentParentSystemData(root, parent, this, system, ComponentGroup);
+        protected override ECTSystemData CreateSystemData(ECTSystemData.SystemInfo info) => new ComponentParentSystemData(info, this, componentGroup);
 
-        public abstract class Component : ECTComponent<TRoot, TComponentParent> { }
 
         public class ComponentParentSystemData : ECTSystemData
         {
-            public ECTSystemDataGroup DataGroup;
+            public ComponentParentSystemData(SystemInfo info, IComponent component, ECTComponentGroup<ECTComponent<TRoot, TComponentParent>> componentGroup) : base(info, component)
+            {
+                DataGroup = new(componentGroup.Components);
+            }
+
+            public ECTSystemDataGroup DataGroup { get; }
 
             public override TSystem GetSystem<TSystem>()
             {
-                if (System is TSystem system) return system;
+                if (Info.System is TSystem system) return system;
 
                 return DataGroup.GetSystem<TSystem>();
-            }
-
-            public ComponentParentSystemData(IRoot root, IParent parent, IComponent component, ISystem system, ECTComponentGroup<ECTComponent<TRoot, TComponentParent>> componentGroup) : base(root, parent, component, system)
-            {
-                DataGroup = new(componentGroup.Components);
             }
         }
 
         public new abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ComponentParentSystemData> where TComponent : class, IComponent, IParent
         {
-            protected override void OnUpdate() => Data.DataGroup.Update(Root, Component);
+            protected override void OnUpdate()
+            {
+                Data.DataGroup.Update(Root, Component);
+            }
         }
+
+        public abstract class Component : ECTComponent<TRoot, TComponentParent> { }
     }
 }

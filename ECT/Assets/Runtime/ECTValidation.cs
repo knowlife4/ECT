@@ -6,7 +6,7 @@ namespace ECT
     {
         public ECTValidation(bool successful) => Successful = successful;
 
-        public static ECTValidation Validate<T>(T input, out T output)
+        public static ECTValidation ValidateReference<T>(T input, out T output)
         {
             output = input;
             return new ECTValidation(input != null);

@@ -10,11 +10,10 @@ namespace ECT
         where TComponent : class, IComponent
         where TSystemData : ECTSystemData
     {
-        public TSystemData Data { get; private set; }
+        protected TSystemData Data { get; private set; }
 
-        protected TRoot Root => Data.Root as TRoot;
-
-        protected TParent Parent => Data.Parent as TParent;
+        protected TRoot Root => Data.Info.Root as TRoot;
+        protected TParent Parent => Data.Info.Parent as TParent;
         protected TComponent Component => Data.Component as TComponent;
 
         public void SetData(ECTSystemData data) => Data = (TSystemData)data;
@@ -29,10 +28,8 @@ namespace ECT
         protected abstract void OnUpdate();
 
         public ECTValidation QuerySystem<TSystem>(out TSystem found) where TSystem : class, ISystem => Root.QuerySystem(out found);
-
         public ECTValidation QueryReference<TReference>(out TReference found) where TReference : struct, ISceneReference => Root.QueryReference(out found);
-
-        public ECTValidation Validate<T>(T input, out T output) where T : class => ECTValidation.Validate(input, out output);
+        public ECTValidation ValidateReference<T>(T input, out T output) where T : class => ECTValidation.ValidateReference(input, out output);
         public ECTValidation Subscribe(ECTAction ectAction, Action action)
         {
             ectAction.Subscribe(action);

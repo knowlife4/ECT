@@ -59,7 +59,7 @@ namespace ECT.Samples.Platformer
             protected override ECTValidation[] Validations => new[]
             {
                 QueryReference(out reference),
-                Validate(Root.transform, out transform),
+                ValidateReference(Root.transform, out transform),
             };
 
             protected override void PopulateData(ref Data data)

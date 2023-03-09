@@ -352,7 +352,7 @@ GameObject:
   - component: {fileID: 1830352491}
   - component: {fileID: 1830352490}
   - component: {fileID: 1830352489}
-  - component: {fileID: 1830352487}
+  - component: {fileID: 1830352492}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -360,26 +360,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1830352487
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1830352486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dedd11708bf1dd143a5aaa833446fe07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  componentGroup:
-    Components:
-    - {fileID: 11400000, guid: 63393b1d372874e4da22b3634281e7e0, type: 2}
-  referenceGroup:
-    References: []
-  references:
-    version: 2
-    RefIds: []
 --- !u!23 &1830352489
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -445,6 +425,31 @@ Transform:
   m_Father: {fileID: 1265822293}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1830352492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830352486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dedd11708bf1dd143a5aaa833446fe07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  componentGroup:
+    Components:
+    - {fileID: 11400000, guid: 63393b1d372874e4da22b3634281e7e0, type: 2}
+  referenceGroup:
+    References:
+    - rid: 1272543082334126103
+  references:
+    version: 2
+    RefIds:
+    - rid: 1272543082334126103
+      type: {class: PlayerMovementRotate/SceneReference, ns: ECT.Samples.Platformer, asm: Assembly-CSharp}
+      data:
+        Target: {fileID: 2088425321}
 --- !u!1 &2088425317
 GameObject:
   m_ObjectHideFlags: 0

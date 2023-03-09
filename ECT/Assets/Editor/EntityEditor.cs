@@ -16,6 +16,11 @@ namespace ECT.UnityEditor
 
         int previousComponentLength;
 
+        public void OnEnable()
+        {
+            UpdateInfo();
+        }
+
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginChangeCheck();
@@ -28,7 +33,7 @@ namespace ECT.UnityEditor
         void UpdateInfo()
         {
             entity = (IEntity)target;
-            components = entity.GetComponents();
+            components = entity.GetComponentsRecursively().ToArray();
 
             referenceGroup = entity.ReferenceGroup;
 
@@ -41,7 +46,9 @@ namespace ECT.UnityEditor
             
             foreach (IComponent component in components)
             {
-                Type type = component.SceneReferenceConstructor.Type;
+                IDynamicConstructor sceneReferenceConstructor = component.GetSceneReferenceConstructor();
+
+                Type type = sceneReferenceConstructor?.Type;
 
                 if(type == null) continue;
 
@@ -55,7 +62,7 @@ namespace ECT.UnityEditor
                     continue;
                 }
 
-                ISceneReference reference = (ISceneReference)component.SceneReferenceConstructor.Create();
+                ISceneReference reference = (ISceneReference)sceneReferenceConstructor.Create();
                 
                 references.Add(reference);
             }

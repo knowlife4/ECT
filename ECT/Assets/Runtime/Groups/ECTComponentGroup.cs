@@ -5,23 +5,21 @@ namespace ECT
     [System.Serializable]
     public class ECTComponentGroup<TComponent> : IComponentGroup where TComponent : IComponent
     {
-        public TComponent[] Components;
+        public TComponent[] Components = System.Array.Empty<TComponent>();
 
-        public IComponent[] GetComponents()
+        public IEnumerable<IComponent> GetComponentsRecursively()
         {
-            List<IComponent> components = new();
-            foreach (TComponent component in Components)
+            foreach (TComponent childComponent in Components)
             {
-                if(component == null) continue;
-                components.AddRange(component.GetComponents());
-            }
+                if(childComponent == null) continue;
 
-            return components.ToArray();
+                foreach (IComponent component in childComponent.GetComponentsRecursively())
+                {
+                    yield return component;
+                }
+            }
         }
     }
 
-    public interface IComponentGroup : IReferenceComponent
-    {
-        
-    }
+    public interface IComponentGroup : IReferenceComponent { }
 }

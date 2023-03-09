@@ -7,13 +7,17 @@ using UnityEngine;
 
 namespace ECT.UnityEditor
 {
-    public class CreationEditor : EditorWindow
+    public class ComponentWizard : EditorWindow
     {
-        [MenuItem("Assets/Create/ECT/Component Instance", false, -10)]
+        [MenuItem("Assets/ECT/Component Wizard", false, -10)]
         static void Open()
         {
-            CreationEditor window = CreateInstance<CreationEditor>();
-            window.position = new Rect(Screen.width / 2f, Screen.height / 2f, 250, 150);
+            ComponentWizard window = CreateInstance<ComponentWizard>();
+            
+            Vector2 size = new Vector2(250, 150);
+            Vector2 position = new Vector2((Screen.currentResolution.width - size.x) / 2, (Screen.currentResolution.height - size.y) / 2);
+            window.position = new Rect(position, size);
+
             window.ShowPopup();
         }
         
@@ -44,6 +48,8 @@ namespace ECT.UnityEditor
         
         string Name { get; set;  }
 
+        protected void OnLostFocus() => Close();
+
         protected void OnEnable()
         {
             (AllComponents, ComponentEntries) = GetType(typeof(IComponent));
@@ -52,9 +58,16 @@ namespace ECT.UnityEditor
         void OnGUI()
         {
             GUILayout.BeginHorizontal("box");
-            GUIStyle style = EditorStyles.boldLabel;
-            style.alignment = TextAnchor.UpperCenter;
-            style.fontSize = 18;
+            GUIStyle style = new()
+            {
+                alignment = TextAnchor.UpperCenter,
+                fontSize = 18,
+                normal =
+                {
+                    textColor = Color.white
+                },
+                fontStyle = FontStyle.Bold
+            };
 
             EditorGUILayout.LabelField("Component Wizard", style);
             GUILayout.EndHorizontal();
@@ -76,9 +89,8 @@ namespace ECT.UnityEditor
             
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("Create")) CreateComponent();
-            if (GUILayout.Button("Cancel")) Close();
-            
+            if (GUILayout.Button("Create") && !string.IsNullOrWhiteSpace(Name)) CreateComponent();
+
             GUILayout.EndHorizontal();
             
             GUILayout.EndVertical();
@@ -90,7 +102,7 @@ namespace ECT.UnityEditor
 
             ScriptableObject scriptableObject = CreateInstance(selected);
 
-            string filePath = Selection.assetGUIDs.Length == 0 ? "Assets/New TMP Color Gradient.asset" : AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs[0]);
+            string filePath = Selection.assetGUIDs.Length == 0 ? "Assets" : AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs[0]);
             
             AssetDatabase.CreateAsset(scriptableObject, $"{filePath}/{Name}.asset");
             AssetDatabase.SaveAssets();

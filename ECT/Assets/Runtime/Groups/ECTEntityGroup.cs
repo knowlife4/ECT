@@ -5,21 +5,22 @@ namespace ECT
     public class ECTEntityGroup<TEntity> where TEntity : IEntity
     {
         public TEntity[] Entities { get; private set; }
-        public List<TEntity> EntitiesList { get; private set; } = new();
 
-        void UpdateArray () => Entities = EntitiesList.ToArray();
+        List<TEntity> entitiesList = new();
 
-        public void Tag (TEntity entity)
+        void UpdateArray() => Entities = entitiesList.ToArray();
+
+        public void Tag(TEntity entity)
         {
-            if(EntitiesList.Contains(entity) || entity == null) return;
-            EntitiesList.Add(entity);
+            if (entity == null || entitiesList.Contains(entity)) return;
+            entitiesList.Add(entity);
             UpdateArray();
         }
 
-        public void UnTag (TEntity entity)
+        public void UnTag(TEntity entity)
         {
-            if(!EntitiesList.Contains(entity)) return;
-            EntitiesList.Remove(entity);
+            if (!entitiesList.Contains(entity)) return;
+            entitiesList.Remove(entity);
             UpdateArray();
         }
     }

@@ -29,7 +29,7 @@ namespace ECT.UnityEditor
         public void DrawElement(Rect rect, int index, SerializedProperty listProperty)
         {
             SerializedProperty baseProp = listProperty.GetArrayElementAtIndex(index);
-            string name = baseProp.managedReferenceFullTypename.Split('.').Last();
+            string name = baseProp.managedReferenceFullTypename.Split(' ').Last().Split('.').Last();
             
             GUI.Label(rect, name);
             

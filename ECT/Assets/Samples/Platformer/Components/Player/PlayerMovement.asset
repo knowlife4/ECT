@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 527a03b5adc8462488661934dd62fc0c, type: 3}
   m_Name: PlayerMovement
   m_EditorClassIdentifier: 
-  ComponentGroup:
+  componentGroup:
     Components:
-    - {fileID: 11400000, guid: e4a12dd637e8e3c4eb396df4bdab0c75, type: 2}
+    - {fileID: 11400000, guid: f6975c6ca0636e34aaa905eccd67a9cc, type: 2}

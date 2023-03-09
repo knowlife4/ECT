@@ -9,7 +9,9 @@ namespace ECT
         {
             Type[] nested = componentType.GetNestedTypes();
 
-            return nested.FirstOrDefault(type => type.IsDefined(typeof(SceneReferenceAttribute), false));
+            Type firstOrDefault = nested.FirstOrDefault(type => type.IsDefined(typeof(SceneReferenceAttribute), false));
+            
+            return firstOrDefault;
         }
     }
 }

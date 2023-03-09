@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace ECT
 {
@@ -9,5 +10,7 @@ namespace ECT
         {
             return new($"{type} does not have a specified Component System! Did you forget to use the [ComponentSystem] Attribute?");
         }
+
+        public static void ThrowAndContinue(Exception exception) => Debug.LogError(exception);
     }
 }

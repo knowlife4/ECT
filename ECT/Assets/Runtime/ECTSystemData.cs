@@ -2,22 +2,32 @@ namespace ECT
 {
     public class ECTSystemData : IReferenceSystem
     {
-        public ECTSystemData(IRoot root, IParent parent, IComponent component, ISystem system)
+        public ECTSystemData(SystemInfo info, IComponent component)
         {
-            Parent = parent;
-            Root = root;
+            Info = info;
             Component = component;
-            System = system;
         }
 
-        public IRoot Root { get; }
-
-        public IParent Parent { get; }
-
+        public SystemInfo Info { get; }
+        
         public IComponent Component { get; }
-        
-        public ISystem System { get; }
-        
-        public virtual TSystem GetSystem<TSystem>() where TSystem : class, ISystem => System as TSystem;
+
+        public virtual TSystem GetSystem<TSystem>() where TSystem : class, ISystem => Info.System as TSystem;
+
+        public struct SystemInfo
+        {
+            public SystemInfo(IRoot root, IParent parent, ISystem system)
+            {
+                Root = root;
+                Parent = parent;
+                System = system;
+            }
+
+            public IRoot Root { get; }
+
+            public IParent Parent { get; }
+
+            public ISystem System { get; }
+        }
     }
 }

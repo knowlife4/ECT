@@ -1,5 +1,5 @@
 using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ECT
@@ -11,41 +11,48 @@ namespace ECT
         protected ECTComponent()
         {
             Type type = GetType();
-            
+
             SystemConstructor = new(ComponentSystemAttribute.Find(type));
             SceneReferenceConstructor = new(SceneReferenceAttribute.Find(type));
         }
 
-        ECTDynamicConstructor<ISystem> SystemConstructor { get; }
+        ECTConstructor<ISystem> SystemConstructor { get; }
 
-        IDynamicConstructor IComponent.SceneReferenceConstructor => SceneReferenceConstructor;
-        ECTDynamicConstructor<ISceneReference> SceneReferenceConstructor { get; }
-        
-        protected virtual ISystem CreateSystem() => SystemConstructor.Create();
-        
-        public virtual ECTSystemData CreateSystemData(IRoot root, IParent parent)
+        ECTConstructor<ISceneReference> SceneReferenceConstructor { get; }
+
+        public IDynamicConstructor GetSystemConstructor() => SystemConstructor;
+
+        public IDynamicConstructor GetSceneReferenceConstructor() => SceneReferenceConstructor;
+
+        public ECTSystemData CreateSystemData(IRoot root, IParent parent)
         {
             ISystem system = CreateSystem();
-            ECTSystemData data = CreateSystemData((TRoot)root, (TParent)parent, system);
+            ECTSystemData data = CreateSystemData(new((TRoot)root, (TParent)parent, system));
             system.SetData(data);
 
             return data;
         }
 
-        protected virtual ECTSystemData CreateSystemData(TRoot root, TParent parent, ISystem system) => new ECTSystemData(root, parent, this, system);
+        protected virtual ISystem CreateSystem() => SystemConstructor.Create();
+
+        protected virtual ECTSystemData CreateSystemData(ECTSystemData.SystemInfo info) => new(info, this);
+
+        public virtual IEnumerable<IComponent> GetComponentsRecursively()
+        {
+            yield return this;
+        }
 
         public abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ECTSystemData> where TComponent : class, IComponent { }
 
         public abstract class Parent : ECTComponentParent<TRoot, TParent, Parent> { }
-        
-        internal virtual IComponent[] GetComponents() => new[] { this };
-        IComponent[] IReferenceComponent.GetComponents() => GetComponents();
     }
 
     public interface IComponent : IReferenceComponent
     {
-        public IDynamicConstructor SceneReferenceConstructor { get; }
+        IDynamicConstructor GetSystemConstructor();
 
-        public ECTSystemData CreateSystemData(IRoot root, IParent parent);
+        IDynamicConstructor GetSceneReferenceConstructor();
+
+        ECTSystemData CreateSystemData(IRoot root, IParent parent);
     }
 }
