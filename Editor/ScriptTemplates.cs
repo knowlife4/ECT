@@ -20,7 +20,7 @@ namespace ECT.UnityEditor
         static string GetScriptTemplateDir()
         {
             bool inPackage = AssetDatabase.IsValidFolder("Packages/com.slice.ect");
-            return inPackage ? "Packages/com.slice.ect/ScriptTemplates" : "Assets/ScriptTemplates";
+            return inPackage ? "Packages/com.slice.ect/Templates" : "Assets/Templates";
         }
     }
 }
