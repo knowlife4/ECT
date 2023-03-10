@@ -1,7 +1,6 @@
 <div align="center">
   <br>
-  <img src="https://user-images.githubusercontent.com/35436522/221697419-85c956f5-31bf-45bd-b74f-4898ffae2999.png" alt="my banner">
-  <h1>Entity Component Tree</h1>
+  <img src="https://user-images.githubusercontent.com/35436522/224447644-18b53d49-aa05-4aa6-8231-c75dc63067a1.png" alt="my banner">
   <strong>A full-featured ECS-like replacement for traditional MonoBehaviours</strong>
 </div>
 <br>
