@@ -1,6 +1,10 @@
 <img src="https://user-images.githubusercontent.com/35436522/221697419-85c956f5-31bf-45bd-b74f-4898ffae2999.png" alt="my banner">
 
 [Documentation](https://github.com/knowlife4/ECT/wiki)
+|
+[Trello](https://trello.com/b/00Bhsj30)
+|
+[Discord](https://discord.gg/yMvG7DC)
 
 ECS-like Modularity in Unity
 
