@@ -42,10 +42,8 @@ namespace ECT
 
         public new abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ComponentParentSystemData> where TComponent : class, IComponent, IParent
         {
-            protected override void OnUpdate()
-            {
-                Data.DataGroup.Update(Root, Component);
-            }
+            public void UpdateSystems() => Data.DataGroup.Update(Root, Component);
+            protected override void OnUpdate() => UpdateSystems();
         }
 
         public abstract class Component : ECTComponent<TRoot, TComponentParent> { }

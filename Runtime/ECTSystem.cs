@@ -29,7 +29,6 @@ namespace ECT
 
         public IValidation QuerySystem<TSystem>(out TSystem found) where TSystem : class, ISystem => Root.QuerySystem(out found);
         public IValidation QueryReference<TReference>(out TReference found) where TReference : struct, ISceneReference => Root.QueryReference(out found);
-        public IValidation ValidateReference<T>(T input, out T output) where T : UnityEngine.Object => ECTValidation.ValidateReference(input, out output);
         public ECTBoolValidation Subscribe(ECTAction ectAction, Action action)
         {
             ectAction.Subscribe(action);

@@ -43,6 +43,7 @@ namespace ECT
         }
         
         protected static IValidation ValidateReferences(params UnityEngine.Object[] references) => ECTValidation.ValidateReferences(references);
+        protected static IValidation ValidateReference<T>(T input, out T output) where T : UnityEngine.Object => ECTValidation.ValidateReference(input, out output);
 
         public abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ECTSystemData> where TComponent : class, IComponent { }
 
