@@ -4,7 +4,7 @@
     "displayName": "ECT- ECS-like Modularity in Unity",
     "description": "Entity Component Tree (ECT) is an entity component library designed for the Unity game engine.",
     "unity": "2022.2",
-    "unityRelease": "9",
+    "unityRelease": "9f",
     "author":
     {
         "name": "SLICE Interactive",
