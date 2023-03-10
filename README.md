@@ -24,6 +24,9 @@
   <a href="https://discord.gg/yMvG7DC">
     <img src="https://img.shields.io/discord/404073310524014592" style="max-width: 100%;">
   </a>
+  <a href="https://trello.com/b/00Bhsj30">
+    <img src="https://img.shields.io/badge/trello-board-yellow?style=flat" style="max-width: 100%;">
+  </a>
 </p>
 
 Entity Component Tree (ECT) is an entity component library designed for the Unity game engine.
