@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace ECT
 {
@@ -14,9 +15,26 @@ namespace ECT
 
         public ECTSystemData[] SystemsData { get; private set; }
 
+        Dictionary<int, ISystem> systemCache = new();
+
         public TSystem GetSystem<TSystem>() where TSystem : class, ISystem
         {
-            return SystemsData.Select(data => data.GetSystem<TSystem>()).FirstOrDefault(system => system != null);
+            int sysId = typeof(TSystem).GetHashCode();
+
+            if (systemCache.TryGetValue(sysId, out ISystem cachedSys))
+            {
+                if(cachedSys != null) return (TSystem)cachedSys;
+                
+                systemCache.Remove(sysId);
+            }
+
+            TSystem foundSystem = SystemsData.Select(data => data.GetSystem<TSystem>()).FirstOrDefault(system => system != null);
+
+            if (foundSystem == null) return null;
+            
+            systemCache.Add(foundSystem.GetType().GetHashCode(), foundSystem);
+
+            return foundSystem;
         }
 
         public void Update(IRoot root, IParent parent)
