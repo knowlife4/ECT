@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace ECT
 
         public IComponent[] Components { get; }
 
-        public ECTSystemData[] SystemsData { get; private set; }
+        public ECTSystemData[] SystemsData { get; private set; } = Array.Empty<ECTSystemData>();
 
         Dictionary<int, ISystem> systemCache = new();
 

@@ -22,8 +22,6 @@ namespace ECT
 
         protected override ECTSystemData CreateSystemData(ECTSystemData.SystemInfo info) => new ComponentParentSystemData(info, this, componentGroup);
 
-        protected override ISystem CreateSystem() => new System<TComponentParent>();
-
 
         public class ComponentParentSystemData : ECTSystemData
         {
@@ -42,7 +40,7 @@ namespace ECT
             }
         }
 
-        public new class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ComponentParentSystemData> where TComponent : class, IComponent, IParent
+        public new abstract class System<TComponent> : ECTSystem<TRoot, TParent, TComponent, ComponentParentSystemData> where TComponent : class, IComponent, IParent
         {
             public void UpdateSystems() => Data.DataGroup.Update(Root, Component);
             protected override void OnUpdate() => UpdateSystems();
